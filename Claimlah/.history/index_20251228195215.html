@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClaimLah – Stop Hoarding Receipts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00C4B4",
+              dark: "#1E293B",
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .main-heading {
+        position: relative;
+        z-index: 222;
+      }
+
+      .main-heading::before {
+        content: "";
+        bottom: 4%;
+        z-index: -1;
+        width: 100%;
+        height: 50%;
+        clip-path: polygon(0 50%, 100% 40%, 100% 100%, 0% 100%);
+        transform: rotate(-1deg);
+        perspective: 1000px;
+        background-color: #122f87;
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-900">
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+      <nav
+        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-2">
+          <div
+            class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold"
+          >
+            C
+          </div>
+          <span class="text-xl font-semibold">ClaimLah</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a
+            href="#features"
+            class="text-gray-600 hover:text-primary transition"
+            >Features</a
+          >
+          <a
+            href="#how-it-works"
+            class="text-gray-600 hover:text-primary transition"
+            >How it Works</a
+          >
+          <a href="#pricing" class="text-gray-600 hover:text-primary transition"
+            >Pricing</a
+          >
+        </div>
+        <a
+          href="#"
+          class="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
+          >Download App</a
+        >
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Text Content -->
+          <div class="text-center lg:text-left order-2 lg:order-1">
+            <span
+              class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-4"
+              >Say goodbye to lost receipts</span
+            >
+            <h1 class="text-4xl md:text-6xl font-bold text-dark mb-6">
+              Stop Hoarding<br />
+              <span class="text-primary main-heading">Receipts</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-xl mb-8">
+              “Manual receipt” is a thing of the past. Snap a photo, let AI
+              extract the data, and get your expenses sorted instantly. LHDN
+              compliant & stress-free.
+            </p>
+            <div
+              class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center"
+            >
+              <a
+                href="#"
+                class="inline-flex items-center bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition"
+              >
+                <i class="bi bi-apple me-2"></i>
+                App Store
+              </a>
+              <a
+                href="#"
+                class="inline-flex items-center bg-black text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition"
+              >
+                <i class="bi bi-google-play me-2"></i>
+                Google Play
+              </a>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">
+              Free tier available • Cancel anytime
+            </p>
+          </div>
+
+          <!-- Images -->
+          <div class="relative order-1 lg:order-2">
+            <!-- Main Hero Image -->
+            <img
+              src="https://sparkreceipt.com/wp-content/uploads/hero-cropped.webp"
+              alt="ClaimLah app in action – AI receipt scanning"
+              class="rounded-2xl shadow-2xl w-full"
+            />
+
+            <!-- Floating LHDN Ready Badge (visible on lg and above) -->
+            <div class="absolute -top-8 -right-8 hidden lg:block">
+              <div
+                class="bg-primary text-white px-6 py-4 rounded-2xl shadow-2xl text-center"
+              >
+                <p class="text-sm font-medium">LHDN</p>
+                <p class="text-2xl font-bold">Ready!</p>
+              </div>
+            </div>
+
+            <!-- Optional secondary floating phone (you can remove if not needed) -->
+            <!--
+        <div class="absolute -bottom-12 -left-12 hidden lg:block">
+          <img 
+            src="https://managereceipt.com/wp-content/uploads/2025/05/iPhone-12-Pro-1024x768.png" 
+            alt="ClaimLah mobile app" 
+            class="rounded-2xl shadow-2xl w-64"
+          >
+        </div>
+        -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problems Section - Shoebox of Doom -->
+    <section class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-5xl font-bold text-dark mb-6">
+          The "Shoebox" of Doom
+        </h2>
+        <p class="text-lg text-gray-600 mb-12">
+          Running a business is hard. Dealing with expenses shouldn’t be.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div
+            class="bg-white border-2 text-left shadow-lg shadow-gray-800 border-gray-900 rounded-2xl p-8 shadow-lg"
+          >
+            <div
+              class="w-12 h-12 bg-primary rounded-lg mb-4 flex items-center justify-center text-white text-2xl"
+            >
+              <i class="bi bi-trash-fill"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Fading Receipts</h3>
+            <p class="text-gray-600">
+              Thermal paper fades. By the time tax season comes, your proof of
+              expense is just a blank white slip.
+            </p>
+          </div>
+          <div
+            class="bg-white border-2 text-left shadow-lg shadow-gray-800 border-gray-900 rounded-2xl p-8 shadow-lg"
+          >
+            <div
+              class="w-12 h-12 bg-primary rounded-lg mb-4 flex items-center justify-center text-white text-2xl"
+            >
+              <i class="bi bi-card-checklist"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Manual Data Entry</h3>
+            <p class="text-gray-600">
+              Spending hours typing dates and amounts into Excel? That’s time
+              you could spend growing your business.
+            </p>
+          </div>
+          <div
+            class="bg-white border-2 text-left shadow-lg shadow-gray-800 border-gray-900 rounded-2xl p-8 shadow-lg"
+          >
+            <div
+              class="w-12 h-12 bg-primary rounded-lg mb-4 flex items-center justify-center text-white text-2xl"
+            >
+              <i class="bi bi-shield-fill-check"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-3">Audit Anxiety</h3>
+            <p class="text-gray-600">
+              Terrified of the LHDN audit because you can’t find that one
+              receipt from 3 years ago?
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-3xl md:text-5xl font-bold text-dark mb-6">
+          Simple, Transparent Pricing
+        </h2>
+        <p class="text-lg text-gray-600 mb-12">
+          Start for free, upgrade when you mean business.
+        </p>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto items-center"
+        >
+          <!-- Free Tier -->
+          <div
+            class="bg-white shadow shadow-gray-500 rounded-3xl shadow-3xl p-10 border border-gray-200"
+          >
+            <h3 class="text-2xl font-semibold mb-4">Free Tier</h3>
+            <p class="text-gray-600 mb-6">For casual tracking</p>
+            <div class="text-4xl font-bold mb-8">
+              RM 0
+              <span class="text-lg font-normal text-gray-600">/ month</span>
+            </div>
+            <ul class="space-y-4 text-left mb-10">
+              <li class="flex items-center">
+                <span class="text-primary mr-3">✓</span> 5 Receipts per month
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-3">✓</span> Basic Budget Tracking
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-3">✓</span> GST Scanning
+              </li>
+              <li class="flex items-center">
+                <span class="text-primary mr-3">✓</span> Cloud Storage
+              </li>
+            </ul>
+            <a
+              href="#"
+              class="block w-full bg-gray-100 text-dark py-4 rounded-full font-medium hover:bg-gray-200 transition"
+              >Download Free App</a
+            >
+          </div>
+
+          <!-- Plus Tier -->
+          <div class="shadow-gray-500 rounded-3xl p-10 shadow-2xl relative">
+            <span
+              class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium"
+              >Recommeded</span
+            >
+            <h3 class="text-2xl font-semibold mb-4">ClaimLah Plus</h3>
+            <p class="mb-6">For serious business</p>
+            <div class="text-5xl font-bold mb-8">
+              RM 9.90 <span class="text-xl font-normal">/ month</span>
+            </div>
+            <ul class="space-y-4 text-left mb-10">
+              <li class="flex items-center">
+                <span class="text-white mr-3">✓</span> Unlimited Receipts
+              </li>
+              <li class="flex items-center">
+                <span class="text-white mr-3">✓</span> AI OCR Scanning
+                (Auto-extract)
+              </li>
+              <li class="flex items-center">
+                <span class="text-white mr-3">✓</span> Secure Cloud Storage
+              </li>
+              <li class="flex items-center">
+                <span class="text-white mr-3">✓</span> Advanced Reporting
+                (PDF/Excel)
+              </li>
+            </ul>
+            <a
+              href="#"
+              class="block w-full bg-white text-primary py-4 rounded-full font-medium hover:bg-gray-100 transition"
+              >Upgrade to Plus</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="py-20 bg-white">
+      <div
+        class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
+      >
+        <div>
+          <img
+            src="https://via.placeholder.com/800x600/1E293B/FFFFFF?text=Snap.+Extract.+Done."
+            alt="Snap Extract Done"
+            class="rounded-2xl shadow-2xl"
+          />
+        </div>
+        <div>
+          <div class="flex items-center mb-6">
+            <div
+              class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-2xl mr-4"
+            >
+              📸
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold">Snap. Extract. Done.</h2>
+          </div>
+          <p class="text-lg text-gray-600 mb-8">
+            Just take a picture. Our AI instantly reads the merchant, date,
+            amount, and tax details. No more typing.
+          </p>
+          <ul class="space-y-4">
+            <li class="flex items-center text-lg">
+              <span class="text-primary mr-4">•</span> 99% Accuracy on Malaysian
+              receipts
+            </li>
+            <li class="flex items-center text-lg">
+              <span class="text-primary mr-4">•</span> Auto-detects SST & GST
+            </li>
+            <li class="flex items-center text-lg">
+              <span class="text-primary mr-4">•</span> Works offline
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-20"
+      >
+        <div class="order-2 lg:order-1">
+          <div class="flex items-center mb-6">
+            <div
+              class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-2xl mr-4"
+            >
+              🛡️
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold">
+              Audit-Proof Your Business
+            </h2>
+          </div>
+          <p class="text-lg text-gray-600 mb-8">
+            We store your digital receipts securely in the cloud for 7 years,
+            meeting LHDN requirements. Sleep easy knowing your documents are
+            safe.
+          </p>
+          <a
+            href="#"
+            class="inline-block border border-primary text-primary px-6 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition"
+            >Learn about compliance →</a
+          >
+        </div>
+        <div class="order-1 lg:order-2">
+          <img
+            src="https://via.placeholder.com/800x600/0F172A/00C4B4?text=TAX+READY"
+            alt="Tax Ready Shield"
+            class="rounded-2xl shadow-2xl"
+          />
+        </div>
+      </div>
+
+      <div
+        class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-20"
+      >
+        <div>
+          <img
+            src="https://via.placeholder.com/800x600/1E293B/FFFFFF?text=One-Click+Reporting"
+            alt="One-Click Reports"
+            class="rounded-2xl shadow-2xl"
+          />
+        </div>
+        <div>
+          <div class="flex items-center mb-6">
+            <div
+              class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white text-2xl mr-4"
+            >
+              📊
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold">One-Click Reports</h2>
+          </div>
+          <p class="text-lg text-gray-600">
+            Need to reimburse employees? Or send data to your accountant?
+            Generate professional PDF or Excel reports in seconds.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-primary to-teal-600 text-white">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h2 class="text-4xl md:text-6xl font-bold mb-6">
+          Start organizing your<br />
+          expenses today.
+        </h2>
+        <p class="text-xl mb-10">Download ClaimLah now on iOS and Android.</p>
+        <div
+          class="flex flex-col sm:flex-row gap-6 justify-center items-center"
+        >
+          <a
+            href="#"
+            class="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 transition text-lg"
+          >
+            <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17 13h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2 0v14h14V5H5z"
+              />
+            </svg>
+            App Store
+          </a>
+          <a
+            href="#"
+            class="inline-flex items-center bg-black text-white px-8 py-4 rounded-lg font-medium hover:bg-gray-800 transition text-lg"
+          >
+            <svg class="w-6 h-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6.135 3.58l13.73 7.93-13.73 7.93z" />
+            </svg>
+            Google Play
+          </a>
+        </div>
+        <p class="text-sm mt-6 opacity-90">
+          Free tier available • Cancel anytime
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-10 border-t">
+      <div
+        class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center"
+      >
+        <div class="flex items-center space-x-2 mb-4 md:mb-0">
+          <div
+            class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold"
+          >
+            C
+          </div>
+          <span class="text-xl font-semibold">ClaimLah</span>
+        </div>
+        <div class="flex space-x-8 text-gray-600">
+          <a href="#" class="hover:text-primary transition">Privacy</a>
+          <a href="#" class="hover:text-primary transition">Terms</a>
+          <a href="#" class="hover:text-primary transition">Contact</a>
+        </div>
+        <p class="text-sm text-gray-500 mt-4 md:mt-0">
+          © 2025 ClaimLah. Bukan Malaysia :)
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
