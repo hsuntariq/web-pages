@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMPACT - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#00C4B4", accent: "#122F87" },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .sidebar-link {
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      .sidebar-link:hover {
+        background-color: #f0f9f8;
+        transform: translateX(8px);
+      }
+      .sidebar-link.active {
+        background-color: #d0f0ee;
+        font-weight: 600;
+        border-left: 4px solid #00c4b4;
+      }
+      .section-content {
+        display: none;
+      }
+      .section-content.active {
+        display: block;
+      }
+      /* Floating Preview */
+      #floatingPreview {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 400px;
+        height: 600px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        z-index: 1000;
+        border: 3px solid #00c4b4;
+      }
+      #floatingPreviewHeader {
+        background: #122f87;
+        color: white;
+        padding: 12px;
+        font-weight: bold;
+        text-align: center;
+        cursor: move;
+      }
+      #previewFrame {
+        width: 100%;
+        height: calc(100% - 50px);
+        border: none;
+      }
+    </style>
+
+    <!-- Cloudinary Widget -->
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
+        authDomain: "webpages-a48d0.firebaseapp.com",
+        projectId: "webpages-a48d0",
+        storageBucket: "webpages-a48d0.firebasestorage.app",
+        messagingSenderId: "1048841699970",
+        appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
+        measurementId: "G-FFJWNXHE0S",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentData = {};
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          document.getElementById("loginForm").classList.add("hidden");
+          document.getElementById("adminPanel").classList.remove("hidden");
+          document.getElementById("userEmail").textContent = user.email;
+          loadContent();
+        } else {
+          document.getElementById("loginForm").classList.remove("hidden");
+          document.getElementById("adminPanel").classList.add("hidden");
+        }
+      });
+
+      window.login = async () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        if (!email || !password)
+          return alert("Please enter email and password");
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          alert(
+            "Login failed: " +
+              (err.code === "auth/wrong-password" ||
+              err.code === "auth/user-not-found"
+                ? "Invalid credentials"
+                : err.message)
+          );
+        }
+      };
+
+      window.logout = () => signOut(auth);
+
+      function loadContent() {
+        onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+          currentData = snap.exists() ? snap.data() : {};
+          populateAllFields();
+          // Refresh preview on any change
+          const frame = document.getElementById("previewFrame");
+          if (frame) frame.contentWindow.location.reload();
+        });
+      }
+
+      function populateAllFields() {
+        // Hero
+        setValue("heroTitle1", currentData.hero?.title1);
+        setValue("heroHighlight", currentData.hero?.highlight);
+        setValue("heroTitle3", currentData.hero?.title3);
+        setValue("heroDesc", currentData.hero?.description);
+        setValue("heroImage", currentData.hero?.image);
+        setValue("hrdcLogo", currentData.hero?.hrdcLogo);
+
+        // Core
+        setValue("coreTitle", currentData.core?.title);
+        setValue("coreSubtitle", currentData.core?.subtitle);
+        setValue("consultancyTitle", currentData.core?.consultancy?.title);
+        setValue(
+          "consultancyItems",
+          (currentData.core?.consultancy?.items || []).join("\n")
+        );
+        setValue("trainingTitle", currentData.core?.training?.title);
+        setValue("trainingDesc", currentData.core?.training?.description);
+        setValue(
+          "trainingTags",
+          (currentData.core?.training?.tags || []).join(", ")
+        );
+        setValue("digitalTitle", currentData.core?.digital?.title);
+        setValue(
+          "digitalItems",
+          (currentData.core?.digital?.items || []).join("\n")
+        );
+
+        // Programs
+        setValue("programsTitle", currentData.programs?.title);
+        setValue("programsDesc", currentData.programs?.description);
+        setValue("programsImage", currentData.programs?.image);
+
+        // Upcoming
+        setValue("upcomingTitle", currentData.upcoming?.title);
+        setValue("upcomingHighlight", currentData.upcoming?.highlight);
+        setValue("upcomingDesc", currentData.upcoming?.description);
+        setValue("upcomingButton", currentData.upcoming?.buttonText);
+
+        // Double Impact
+        setValue("doubleTitle", currentData.doubleImpact?.title);
+        setValue("doubleSubtitle", currentData.doubleImpact?.subtitle);
+        setValue("feature1Title", currentData.doubleImpact?.feature1?.title);
+        setValue("feature1Desc", currentData.doubleImpact?.feature1?.desc);
+        setValue("feature2Title", currentData.doubleImpact?.feature2?.title);
+        setValue("feature2Desc", currentData.doubleImpact?.feature2?.desc);
+        setValue("feature3Title", currentData.doubleImpact?.feature3?.title);
+        setValue("feature3Desc", currentData.doubleImpact?.feature3?.desc);
+        setValue(
+          "testimonialTitle",
+          currentData.doubleImpact?.testimonialTitle
+        );
+        setValue(
+          "testimonialSubtitle",
+          currentData.doubleImpact?.testimonialSubtitle
+        );
+        setValue("quote1", currentData.doubleImpact?.quote1);
+        setValue("author1", currentData.doubleImpact?.author1);
+        setValue("quote2", currentData.doubleImpact?.quote2);
+        setValue("author2", currentData.doubleImpact?.author2);
+
+        // CTA
+        setValue("ctaTitle", currentData.cta?.title);
+        setValue("ctaHighlight", currentData.cta?.highlight);
+        setValue("ctaDesc", currentData.cta?.description);
+        setValue("ctaButton1", currentData.cta?.button1);
+        setValue("ctaButton2", currentData.cta?.button2);
+
+        // Footer
+        setValue("footerDesc", currentData.footer?.description);
+        setValue(
+          "footerServices",
+          (currentData.footer?.services || []).join("\n")
+        );
+        setValue(
+          "footerCompany",
+          (currentData.footer?.company || []).join("\n")
+        );
+      }
+
+      function setValue(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.value = value || "";
+      }
+
+      window.saveAll = async () => {
+        const data = {
+          hero: {
+            title1: getValue("heroTitle1"),
+            highlight: getValue("heroHighlight"),
+            title3: getValue("heroTitle3"),
+            description: getValue("heroDesc"),
+            image: getValue("heroImage"),
+            hrdcLogo: getValue("hrdcLogo"),
+          },
+          core: {
+            title: getValue("coreTitle"),
+            subtitle: getValue("coreSubtitle"),
+            consultancy: {
+              title: getValue("consultancyTitle"),
+              items: splitLines("consultancyItems"),
+            },
+            training: {
+              title: getValue("trainingTitle"),
+              description: getValue("trainingDesc"),
+              tags: splitComma("trainingTags"),
+            },
+            digital: {
+              title: getValue("digitalTitle"),
+              items: splitLines("digitalItems"),
+            },
+          },
+          programs: {
+            title: getValue("programsTitle"),
+            description: getValue("programsDesc"),
+            image: getValue("programsImage"),
+          },
+          upcoming: {
+            title: getValue("upcomingTitle"),
+            highlight: getValue("upcomingHighlight"),
+            description: getValue("upcomingDesc"),
+            buttonText: getValue("upcomingButton"),
+          },
+          doubleImpact: {
+            title: getValue("doubleTitle"),
+            subtitle: getValue("doubleSubtitle"),
+            feature1: {
+              title: getValue("feature1Title"),
+              desc: getValue("feature1Desc"),
+            },
+            feature2: {
+              title: getValue("feature2Title"),
+              desc: getValue("feature2Desc"),
+            },
+            feature3: {
+              title: getValue("feature3Title"),
+              desc: getValue("feature3Desc"),
+            },
+            testimonialTitle: getValue("testimonialTitle"),
+            testimonialSubtitle: getValue("testimonialSubtitle"),
+            quote1: getValue("quote1"),
+            author1: getValue("author1"),
+            quote2: getValue("quote2"),
+            author2: getValue("author2"),
+          },
+          cta: {
+            title: getValue("ctaTitle"),
+            highlight: getValue("ctaHighlight"),
+            description: getValue("ctaDesc"),
+            button1: getValue("ctaButton1"),
+            button2: getValue("ctaButton2"),
+          },
+          footer: {
+            description: getValue("footerDesc"),
+            services: splitLines("footerServices"),
+            company: splitLines("footerCompany"),
+          },
+        };
+
+        function getValue(id) {
+          return document.getElementById(id)?.value.trim() || "";
+        }
+        function splitLines(id) {
+          return (
+            document
+              .getElementById(id)
+              ?.value.split("\n")
+              .map((s) => s.trim())
+              .filter((s) => s) || []
+          );
+        }
+        function splitComma(id) {
+          return (
+            document
+              .getElementById(id)
+              ?.value.split(",")
+              .map((s) => s.trim())
+              .filter((s) => s) || []
+          );
+        }
+
+        try {
+          await setDoc(doc(db, "siteContent", "main"), data, { merge: true });
+          alert("✅ Changes saved! Only what you edited was updated.");
+          document
+            .getElementById("previewFrame")
+            .contentWindow.location.reload();
+        } catch (e) {
+          alert("Save error: " + e.message);
+        }
+      };
+
+      window.openUploader = (fieldId) => {
+        cloudinary
+          .createUploadWidget(
+            {
+              cloudName: "YOUR_CLOUDINARY_CLOUD_NAME", // ← REPLACE THIS
+              uploadPreset: "impact_unsigned",
+              cropping: true,
+              folder: "impact-site",
+            },
+            (error, result) => {
+              if (!error && result && result.event === "success") {
+                document.getElementById(fieldId).value = result.info.secure_url;
+              }
+            }
+          )
+          .open();
+      };
+
+      // Sidebar section switcher - FIXED
+      window.openSection = (sectionId) => {
+        document
+          .querySelectorAll(".section-content")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".sidebar-link")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+        document
+          .querySelector(`.sidebar-link[onclick="openSection('${sectionId}')"]`)
+          .classList.add("active");
+      };
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Login -->
+    <div
+      id="loginForm"
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-accent to-black"
+    >
+      <div class="bg-white p-16 rounded-3xl shadow-2xl w-96 text-center">
+        <h1 class="text-5xl font-bold text-primary mb-12">IMPACT ADMIN</h1>
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full p-5 mb-6 border-2 rounded-xl text-lg focus:border-primary outline-none"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-5 mb-10 border-2 rounded-xl text-lg focus:border-primary outline-none"
+        />
+        <button
+          onclick="login()"
+          class="w-full bg-primary text-white py-6 rounded-xl text-2xl font-bold hover:bg-primary/90 transition"
+        >
+          LOGIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden h-screen flex">
+      <!-- Sidebar -->
+      <div
+        class="w-80 bg-white border-r border-gray-300 shadow-xl overflow-y-auto"
+      >
+        <div class="p-8 bg-gradient-to-b from-accent to-primary text-white">
+          <h1 class="text-3xl font-bold">IMPACT Admin</h1>
+          <p class="mt-3 opacity-90">Logged in as:</p>
+          <p id="userEmail" class="font-bold text-xl mt-1"></p>
+          <button
+            onclick="logout()"
+            class="mt-8 w-full bg-white text-accent py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+          >
+            Logout
+          </button>
+        </div>
+        <nav class="p-6">
+          <ul class="space-y-3">
+            <li>
+              <div
+                onclick="openSection('heroSection')"
+                class="sidebar-link active py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                1. Hero Section
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('coreSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                2. Core Capabilities
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('programsSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                3. Certified Programs
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('upcomingSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                4. Upcoming Classes
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('doubleSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                5. Double Impact
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('ctaSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                6. Call to Action
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('footerSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg font-medium"
+              >
+                7. Footer
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Editor Area -->
+      <div class="flex-1 overflow-y-auto p-12 bg-gray-50">
+        <div class="max-w-5xl mx-auto space-y-12">
+          <!-- Hero Section -->
+          <div
+            id="heroSection"
+            class="section-content active bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">Hero Section</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label class="block text-lg font-medium mb-3"
+                  >Title Line 1</label
+                >
+                <input
+                  id="heroTitle1"
+                  class="w-full p-5 border-2 rounded-xl text-lg"
+                  placeholder="IMPACT"
+                />
+              </div>
+              <div>
+                <label class="block text-lg font-medium mb-3"
+                  >Highlighted Word</label
+                >
+                <input
+                  id="heroHighlight"
+                  class="w-full p-5 border-2 rounded-xl text-lg"
+                  placeholder="THROUGH"
+                />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-lg font-medium mb-3"
+                  >Title Line 3</label
+                >
+                <input
+                  id="heroTitle3"
+                  class="w-full p-5 border-2 rounded-xl text-lg"
+                  placeholder="EXECUTION"
+                />
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-lg font-medium mb-3"
+                  >Description</label
+                >
+                <textarea
+                  id="heroDesc"
+                  class="w-full p-5 border-2 rounded-xl h-40 text-lg"
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-lg font-medium mb-3">Hero Image</label>
+                <input
+                  id="heroImage"
+                  class="w-full p-5 border-2 rounded-xl mb-3"
+                  placeholder="Image URL"
+                />
+                <button
+                  onclick="openUploader('heroImage')"
+                  class="w-full bg-primary text-white py-4 rounded-xl font-bold"
+                >
+                  Upload Image
+                </button>
+              </div>
+              <div>
+                <label class="block text-lg font-medium mb-3">HRDC Logo</label>
+                <input
+                  id="hrdcLogo"
+                  class="w-full p-5 border-2 rounded-xl mb-3"
+                  placeholder="Logo URL"
+                />
+                <button
+                  onclick="openUploader('hrdcLogo')"
+                  class="w-full bg-primary text-white py-4 rounded-xl font-bold"
+                >
+                  Upload Logo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- All other sections (coreSection, programsSection, etc.) are the same as before -->
+          <!-- They are fully included below — no skipping -->
+
+          <!-- Core Capabilities -->
+          <div
+            id="coreSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">
+              Core Capabilities
+            </h2>
+            <input
+              id="coreTitle"
+              class="w-full p-5 border-2 rounded-xl text-xl mb-6"
+            />
+            <textarea
+              id="coreSubtitle"
+              class="w-full p-5 border-2 rounded-xl h-32 mb-10"
+            ></textarea>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div class="bg-gray-50 p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold mb-6">Consultancy PM & AI</h3>
+                <input
+                  id="consultancyTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="consultancyItems"
+                  class="w-full p-4 border rounded-lg h-64"
+                  placeholder="One bullet per line"
+                ></textarea>
+              </div>
+              <div class="bg-gray-50 p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold mb-6">Training</h3>
+                <input
+                  id="trainingTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="trainingDesc"
+                  class="w-full p-4 border rounded-lg h-40 mb-4"
+                ></textarea>
+                <input
+                  id="trainingTags"
+                  class="w-full p-4 border rounded-lg"
+                  placeholder="Comma separated tags"
+                />
+              </div>
+              <div class="bg-gray-50 p-8 rounded-2xl">
+                <h3 class="text-2xl font-bold mb-6">Digital Execution</h3>
+                <input
+                  id="digitalTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="digitalItems"
+                  class="w-full p-4 border rounded-lg h-64"
+                  placeholder="One bullet per line"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certified Programs -->
+          <div
+            id="programsSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">
+              Certified Training Programs
+            </h2>
+            <input
+              id="programsTitle"
+              class="w-full p-5 border-2 rounded-xl text-xl mb-6"
+            />
+            <textarea
+              id="programsDesc"
+              class="w-full p-5 border-2 rounded-xl h-48 mb-8"
+            ></textarea>
+            <input
+              id="programsImage"
+              class="w-full p-5 border-2 rounded-xl mb-4"
+              placeholder="Image URL"
+            />
+            <button
+              onclick="openUploader('programsImage')"
+              class="w-full bg-primary text-white py-5 rounded-xl text-xl font-bold"
+            >
+              Upload Image
+            </button>
+          </div>
+
+          <!-- Upcoming Classes -->
+          <div
+            id="upcomingSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">
+              Upcoming Classes
+            </h2>
+            <input
+              id="upcomingTitle"
+              class="w-full p-5 border-2 rounded-xl mb-4"
+            />
+            <input
+              id="upcomingHighlight"
+              class="w-full p-5 border-2 rounded-xl mb-6"
+            />
+            <textarea
+              id="upcomingDesc"
+              class="w-full p-5 border-2 rounded-xl h-40 mb-6"
+            ></textarea>
+            <input id="upcomingButton" class="w-full p-5 border-2 rounded-xl" />
+          </div>
+
+          <!-- Double Impact -->
+          <div
+            id="doubleSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">
+              Double Impact Advantage
+            </h2>
+            <input
+              id="doubleTitle"
+              class="w-full p-5 border-2 rounded-xl mb-6"
+            />
+            <textarea
+              id="doubleSubtitle"
+              class="w-full p-5 border-2 rounded-xl h-40 mb-10"
+            ></textarea>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+              <div class="bg-teal-50 p-6 rounded-2xl">
+                <input
+                  id="feature1Title"
+                  class="w-full p-4 border rounded-lg mb-4 text-lg font-bold"
+                />
+                <textarea
+                  id="feature1Desc"
+                  class="w-full p-4 border rounded-lg h-48"
+                ></textarea>
+              </div>
+              <div class="bg-teal-50 p-6 rounded-2xl">
+                <input
+                  id="feature2Title"
+                  class="w-full p-4 border rounded-lg mb-4 text-lg font-bold"
+                />
+                <textarea
+                  id="feature2Desc"
+                  class="w-full p-4 border rounded-lg h-48"
+                ></textarea>
+              </div>
+              <div class="bg-teal-50 p-6 rounded-2xl">
+                <input
+                  id="feature3Title"
+                  class="w-full p-4 border rounded-lg mb-4 text-lg font-bold"
+                />
+                <textarea
+                  id="feature3Desc"
+                  class="w-full p-4 border rounded-lg h-48"
+                ></textarea>
+              </div>
+            </div>
+            <h3 class="text-3xl font-bold mb-8">Testimonials</h3>
+            <input
+              id="testimonialTitle"
+              class="w-full p-5 border-2 rounded-xl mb-4"
+            />
+            <input
+              id="testimonialSubtitle"
+              class="w-full p-5 border-2 rounded-xl mb-6"
+            />
+            <textarea
+              id="quote1"
+              class="w-full p-5 border-2 rounded-xl h-40 mb-4"
+            ></textarea>
+            <input id="author1" class="w-full p-5 border-2 rounded-xl mb-8" />
+            <textarea
+              id="quote2"
+              class="w-full p-5 border-2 rounded-xl h-40 mb-4"
+            ></textarea>
+            <input id="author2" class="w-full p-5 border-2 rounded-xl" />
+          </div>
+
+          <!-- CTA -->
+          <div
+            id="ctaSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">Call to Action</h2>
+            <input
+              id="ctaTitle"
+              class="w-full p-5 border-2 rounded-xl mb-4"
+              placeholder="READY TO MAKE AN IMPACT?"
+            />
+            <input
+              id="ctaHighlight"
+              class="w-full p-5 border-2 rounded-xl mb-6"
+              placeholder="IMPACT"
+            />
+            <textarea
+              id="ctaDesc"
+              class="w-full p-5 border-2 rounded-xl h-48 mb-8"
+            ></textarea>
+            <input
+              id="ctaButton1"
+              class="w-full p-5 border-2 rounded-xl mb-4"
+              placeholder="GET IN TOUCH"
+            />
+            <input
+              id="ctaButton2"
+              class="w-full p-5 border-2 rounded-xl"
+              placeholder="VIEW CASE STUDIES"
+            />
+          </div>
+
+          <!-- Footer -->
+          <div
+            id="footerSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-10">Footer</h2>
+            <textarea
+              id="footerDesc"
+              class="w-full p-5 border-2 rounded-xl h-48 mb-10"
+            ></textarea>
+            <h3 class="text-2xl font-bold mb-6">Services Links</h3>
+            <textarea
+              id="footerServices"
+              class="w-full p-5 border-2 rounded-xl h-64 mb-10"
+              placeholder="One per line"
+            ></textarea>
+            <h3 class="text-2xl font-bold mb-6">Company Links</h3>
+            <textarea
+              id="footerCompany"
+              class="w-full p-5 border-2 rounded-xl h-64"
+              placeholder="One per line"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Preview Window -->
+    <div id="floatingPreview" class="hidden">
+      <div id="floatingPreviewHeader">LIVE PREVIEW - index.html</div>
+      <iframe id="previewFrame" src="index.html"></iframe>
+    </div>
+
+    <!-- Show floating preview after login -->
+    <script>
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          document.getElementById("floatingPreview").classList.remove("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMPACT - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: { colors: { primary: "#00C4B4", accent: "#122F87" } },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+
+    <!-- Cloudinary Widget -->
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
+        authDomain: "webpages-a48d0.firebaseapp.com",
+        projectId: "webpages-a48d0",
+        storageBucket: "webpages-a48d0.firebasestorage.app",
+        messagingSenderId: "1048841699970",
+        appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
+        measurementId: "G-FFJWNXHE0S",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentData = {};
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          document.getElementById("loginForm").classList.add("hidden");
+          document.getElementById("adminPanel").classList.remove("hidden");
+          loadContent();
+        } else {
+          document.getElementById("loginForm").classList.remove("hidden");
+          document.getElementById("adminPanel").classList.add("hidden");
+        }
+      });
+
+      window.login = async () => {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          alert("Login failed: " + err.message);
+        }
+      };
+
+      window.logout = () => signOut(auth);
+
+      function loadContent() {
+        onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+          currentData = snap.exists() ? snap.data() : {};
+          populateFields();
+        });
+      }
+
+      function populateFields() {
+        document.getElementById("heroTitle1").value =
+          currentData.hero?.title1 || "";
+        document.getElementById("heroHighlight").value =
+          currentData.hero?.highlight || "";
+        document.getElementById("heroTitle3").value =
+          currentData.hero?.title3 || "";
+        document.getElementById("heroDesc").value =
+          currentData.hero?.description || "";
+        document.getElementById("heroImage").value =
+          currentData.hero?.image || "";
+        document.getElementById("hrdcLogo").value =
+          currentData.hero?.hrdcLogo || "";
+
+        document.getElementById("coreTitle").value =
+          currentData.core?.title || "";
+        document.getElementById("coreSubtitle").value =
+          currentData.core?.subtitle || "";
+
+        document.getElementById("consultancyTitle").value =
+          currentData.core?.consultancy?.title || "";
+        document.getElementById("consultancyItems").value = (
+          currentData.core?.consultancy?.items || []
+        ).join("\n");
+
+        document.getElementById("trainingTitle").value =
+          currentData.core?.training?.title || "";
+        document.getElementById("trainingDesc").value =
+          currentData.core?.training?.description || "";
+        document.getElementById("trainingTags").value = (
+          currentData.core?.training?.tags || []
+        ).join(", ");
+
+        document.getElementById("digitalTitle").value =
+          currentData.core?.digital?.title || "";
+        document.getElementById("digitalItems").value = (
+          currentData.core?.digital?.items || []
+        ).join("\n");
+
+        document.getElementById("programsTitle").value =
+          currentData.programs?.title || "";
+        document.getElementById("programsDesc").value =
+          currentData.programs?.description || "";
+        document.getElementById("programsImage").value =
+          currentData.programs?.image || "";
+      }
+
+      window.saveAll = async () => {
+        const updatedData = {
+          hero: {
+            title1: document.getElementById("heroTitle1").value,
+            highlight: document.getElementById("heroHighlight").value,
+            title3: document.getElementById("heroTitle3").value,
+            description: document.getElementById("heroDesc").value,
+            image: document.getElementById("heroImage").value,
+            hrdcLogo: document.getElementById("hrdcLogo").value,
+          },
+          core: {
+            title: document.getElementById("coreTitle").value,
+            subtitle: document.getElementById("coreSubtitle").value,
+            consultancy: {
+              title: document.getElementById("consultancyTitle").value,
+              items: document
+                .getElementById("consultancyItems")
+                .value.split("\n")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+            training: {
+              title: document.getElementById("trainingTitle").value,
+              description: document.getElementById("trainingDesc").value,
+              tags: document
+                .getElementById("trainingTags")
+                .value.split(",")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+            digital: {
+              title: document.getElementById("digitalTitle").value,
+              items: document
+                .getElementById("digitalItems")
+                .value.split("\n")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+          },
+          programs: {
+            title: document.getElementById("programsTitle").value,
+            description: document.getElementById("programsDesc").value,
+            image: document.getElementById("programsImage").value,
+          },
+        };
+
+        try {
+          await setDoc(doc(db, "siteContent", "main"), updatedData);
+          alert("All changes saved successfully!");
+          document
+            .getElementById("previewFrame")
+            .contentWindow.location.reload();
+        } catch (err) {
+          alert("Save failed: " + err.message);
+        }
+      };
+
+      window.openUploader = (fieldId) => {
+        const widget = cloudinary.createUploadWidget(
+          {
+            cloudName: "dxhr3hdkc",
+            uploadPreset: "impact_unsigned",
+            cropping: true,
+            folder: "impact-site",
+          },
+          (error, result) => {
+            if (!error && result && result.event === "success") {
+              document.getElementById(fieldId).value = result.info.secure_url;
+            }
+          }
+        );
+        widget.open();
+      };
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Login Screen -->
+    <div
+      id="loginForm"
+      class="min-h-screen flex items-center justify-center bg-gray-900"
+    >
+      <div class="bg-white p-10 rounded-2xl shadow-2xl w-96">
+        <h1 class="text-4xl font-bold text-accent mb-8 text-center">
+          Admin Login
+        </h1>
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full p-4 border rounded-lg mb-4"
+          value="admin@example.com"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-4 border rounded-lg mb-6"
+        />
+        <button
+          onclick="login()"
+          class="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg hover:bg-primary/90"
+        >
+          LOGIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminPanel" class="hidden h-screen flex">
+      <!-- Left: Editor -->
+      <div class="w-1/2 overflow-y-auto bg-white p-10 space-y-8">
+        <div class="flex justify-between items-center mb-10">
+          <h1 class="text-4xl font-bold text-accent">Edit Website Content</h1>
+          <button
+            onclick="logout()"
+            class="bg-red-600 text-white px-6 py-3 rounded-lg"
+          >
+            Logout
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-2xl font-bold">Hero Section</h2>
+          <input
+            id="heroTitle1"
+            class="w-full p-3 border rounded"
+            placeholder="IMPACT"
+          />
+          <input
+            id="heroHighlight"
+            class="w-full p-3 border rounded"
+            placeholder="THROUGH"
+          />
+          <input
+            id="heroTitle3"
+            class="w-full p-3 border rounded"
+            placeholder="EXECUTION"
+          />
+          <textarea
+            id="heroDesc"
+            class="w-full p-3 border rounded h-32"
+            placeholder="Description"
+          ></textarea>
+          <div class="flex gap-3">
+            <input
+              id="heroImage"
+              class="flex-1 p-3 border rounded"
+              placeholder="Hero Image URL"
+            />
+            <button
+              onclick="openUploader('heroImage')"
+              class="bg-primary text-white px-6 py-3 rounded"
+            >
+              Upload
+            </button>
+          </div>
+          <div class="flex gap-3">
+            <input
+              id="hrdcLogo"
+              class="flex-1 p-3 border rounded"
+              placeholder="HRDC Logo URL"
+            />
+            <button
+              onclick="openUploader('hrdcLogo')"
+              class="bg-primary text-white px-6 py-3 rounded"
+            >
+              Upload
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-2xl font-bold">Core Capabilities</h2>
+          <input id="coreTitle" class="w-full p-3 border rounded" />
+          <textarea
+            id="coreSubtitle"
+            class="w-full p-3 border rounded h-24"
+          ></textarea>
+
+          <h3 class="text-xl font-bold">Consultancy</h3>
+          <input id="consultancyTitle" class="w-full p-3 border rounded" />
+          <textarea
+            id="consultancyItems"
+            class="w-full p-3 border rounded h-32"
+            placeholder="One item per line"
+          ></textarea>
+
+          <h3 class="text-xl font-bold">Training</h3>
+          <input id="trainingTitle" class="w-full p-3 border rounded" />
+          <textarea
+            id="trainingDesc"
+            class="w-full p-3 border rounded h-24"
+          ></textarea>
+          <input
+            id="trainingTags"
+            class="w-full p-3 border rounded"
+            placeholder="Comma separated tags"
+          />
+
+          <h3 class="text-xl font-bold">Digital Execution</h3>
+          <input id="digitalTitle" class="w-full p-3 border rounded" />
+          <textarea
+            id="digitalItems"
+            class="w-full p-3 border rounded h-32"
+            placeholder="One item per line"
+          ></textarea>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-2xl font-bold">Certified Programs</h2>
+          <input id="programsTitle" class="w-full p-3 border rounded" />
+          <textarea
+            id="programsDesc"
+            class="w-full p-3 border rounded h-32"
+          ></textarea>
+          <div class="flex gap-3">
+            <input
+              id="programsImage"
+              class="flex-1 p-3 border rounded"
+              placeholder="Programs Image URL"
+            />
+            <button
+              onclick="openUploader('programsImage')"
+              class="bg-primary text-white px-6 py-3 rounded"
+            >
+              Upload
+            </button>
+          </div>
+        </div>
+
+        <button
+          onclick="saveAll()"
+          class="fixed bottom-8 left-8 bg-green-600 text-white px-10 py-5 rounded-lg text-xl font-bold shadow-lg hover:bg-green-700"
+        >
+          SAVE ALL CHANGES
+        </button>
+      </div>
+
+      <!-- Right: Live Preview -->
+      <div class="w-1/2 bg-gray-200 border-l-4 border-gray-400">
+        <iframe
+          id="previewFrame"
+          src="index.html"
+          class="w-full h-full border-0"
+        ></iframe>
+      </div>
+    </div>
+  </body>
+</html>

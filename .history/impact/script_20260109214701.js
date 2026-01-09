@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Impact Through Execution – HRDC Certified Training Provider Malaysia</title>
+  <meta id="pageDesc" name="description" content="HRDC certified training provider offering PMP, CAPM, Agile, AI in PM, and digital transformation courses in Malaysia." />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00C4B4",
+            accent: "#122F87",
+          },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "REPLACE_WITH_YOUR_API_KEY",
+      authDomain: "REPLACE_WITH_YOUR_PROJECT.firebaseapp.com",
+      projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
+      storageBucket: "REPLACE_WITH_YOUR_PROJECT.appspot.com",
+      messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
+      appId: "REPLACE_WITH_YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Default fallback data (in case Firestore is empty)
+    const defaultData = {
+      hero: {
+        hrdcLogo: "https://precisionwellness.my/wp-content/uploads/2025/06/HRDC_Claimable_Registered_Training_Provider_Logos-scaled.webp",
+        title1: "IMPACT",
+        highlight: "THROUGH",
+        title3: "EXECUTION",
+        description: "We bring value that has strong impact to the organization & individual through Consultancy, Training, and Digital Execution.",
+        image: "./hero.PNG"
+      },
+      core: {
+        title: "CORE CAPABILITIES",
+        subtitle: "Comprehensive solutions designed to transform your business operations and empower your workforce.",
+        consultancy: {
+          title: "CONSULTANCY PM & AI",
+          items: ["Agentic AI Implementation", "PMO Setup & Optimization", "Business Process Reengineering", "Project Execution Strategy"]
+        },
+        training: {
+          title: "TRAINING",
+          description: "Empower your team with industry-recognized certifications and practical skills.",
+          tags: ["PMP", "CAPM", "Agile", "PMC-CP", "Lean & Sigma", "Power BI"]
+        },
+        digital: {
+          title: "DIGITAL EXECUTION",
+          items: ["Digital Transformation", "Automation Workflows", "Data Analytics Solutions"]
+        }
+      },
+      programs: {
+        title: "CERTIFIED TRAINING PROGRAMS",
+        description: "We are an HRDC Training Provider offering a wide range of certification and non-certification courses designed to elevate professional capabilities.",
+        image: "./programs.PNG"
+      }
+      // Add more sections if needed later
+    };
+
+    onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+      const data = snap.exists() ? snap.data() : defaultData;
+
+      // Hero Section
+      document.getElementById("hrdcLogo").src = data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
+      document.getElementById("heroTitle1").textContent = data.hero?.title1 || "";
+      document.getElementById("heroHighlight").textContent = data.hero?.highlight || "";
+      document.getElementById("heroTitle3").textContent = data.hero?.title3 || "";
+      document.getElementById("heroDesc").textContent = data.hero?.description || "";
+      document.getElementById("heroImage").src = data.hero?.image || "./hero.PNG";
+
+      // Core Capabilities
+      document.getElementById("coreTitle").textContent = data.core?.title || "";
+      document.getElementById("coreSubtitle").textContent = data.core?.subtitle || "";
+
+      document.getElementById("consultancyTitle").textContent = data.core?.consultancy?.title || "";
+      document.getElementById("consultancyList").innerHTML = (data.core?.consultancy?.items || []).map(i => `<li>• ${i}</li>`).join("");
+
+      document.getElementById("trainingTitle").textContent = data.core?.training?.title || "";
+      document.getElementById("trainingDesc").textContent = data.core?.training?.description || "";
+      document.getElementById("trainingTags").innerHTML = (data.core?.training?.tags || []).map(t => `<span class="bg-gray-200 px-3 py-1 rounded text-sm">${t}</span>`).join("");
+
+      document.getElementById("digitalTitle").textContent = data.core?.digital?.title || "";
+      document.getElementById("digitalList").innerHTML = (data.core?.digital?.items || []).map(i => `<li>• ${i}</li>`).join("");
+
+      // Certified Programs
+      document.getElementById("programsTitle").textContent = data.programs?.title || "";
+      document.getElementById("programsDesc").textContent = data.programs?.description || "";
+      document.getElementById("programsImage").src = data.programs?.image || "./programs.PNG";
+    });
+  </script>
+</head>
+<body class="bg-white text-gray-900">
+
+  <!-- Navigation -->
+  <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+    <nav class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="text-2xl font-bold text-accent">IMPACT</div>
+      <div class="hidden md:flex space-x-8 text-sm font-medium">
+        <a href="#services" class="hover:text-primary transition">SERVICES</a>
+        <a href="#training" class="hover:text-primary transition">TRAINING</a>
+        <a href="#about" class="hover:text-primary transition">ABOUT</a>
+        <a href="#contact" class="hover:text-primary transition">CONTACT</a>
+      </div>
+      <a href="#" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition">GET STARTED</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="pt-24 pb-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <img id="hrdcLogo" src="" alt="HRDC Certified" class="h-12 mb-6" />
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+          <span id="heroTitle1"></span><br />
+          <span id="heroHighlight" class="bg-gradient-to-r text-transparent from-teal-500 bg-clip-text to-green-400"></span><br />
+          <span id="heroTitle3"></span>
+        </h1>
+        <p id="heroDesc" class="text-lg text-gray-600 border-l-4 border-teal-400 ps-5 mt-6 mb-8"></p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="#" class="bg-primary text-white px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition">OUR SERVICES</a>
+          <a href="#" class="border border-gray-900 text-gray-900 px-8 py-4 rounded-md font-medium hover:bg-gray-900 hover:text-white transition">CONTACT US</a>
+        </div>
+      </div>
+      <div class="relative">
+        <img id="heroImage" src="" alt="Agentic AI transforming project management" class="rounded-2xl shadow-2xl w-full" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 id="coreTitle" class="text-4xl font-bold mb-12"></h2>
+      <p id="coreSubtitle" class="text-gray-600 mb-16 w-full md:w-1/2"></p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-gray-50 rounded-2xl p-8 shadow-lg">
+          <div class="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="bi bi-perplexity text-2xl"></i>
+          </div>
+          <h3 id="consultancyTitle" class="text-2xl font-bold mb-4"></h3>
+          <ul id="consultancyList" class="space-y-3 text-gray-600"></ul>
+          <a href="#" class="mt-8 inline-block text-primary font-medium hover:underline">LEARN MORE →</a>
+        </div>
+
+        <div class="bg-gradient-to-b from-teal-50 to-white rounded-2xl shadow-2xl border-[5px] border-green-400 border-b-0 border-l-0 border-r-0 p-8">
+          <div class="bg-green-200 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="bi bi-people text-2xl"></i>
+          </div>
+          <h3 id="trainingTitle" class="text-2xl font-bold mb-4"></h3>
+          <p id="trainingDesc" class="text-gray-600 mb-6"></p>
+          <div id="trainingTags" class="flex flex-wrap gap-2 mb-6"></div>
+          <a href="#" class="mt-8 inline-block text-green-400 font-medium hover:underline">VIEW COURSE CATALOG →</a>
+        </div>
+
+        <div class="bg-gray-50 rounded-2xl p-8 shadow-lg">
+          <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <i class="bi bi-cpu text-2xl"></i>
+          </div>
+          <h3 id="digitalTitle" class="text-2xl font-bold mb-4"></h3>
+          <ul id="digitalList" class="space-y-3 text-gray-600"></ul>
+          <a href="#" class="mt-8 inline-block text-primary font-medium hover:underline">LEARN MORE →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certified Training Programs -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <h2 id="programsTitle" class="text-4xl font-bold mb-6"></h2>
+        <p id="programsDesc" class="text-gray-600 mb-8"></p>
+        <!-- You can expand this section later in admin -->
+        <button class="bg-gray-900 text-white px-8 py-4 mt-10 rounded-md font-medium hover:bg-gray-800 transition">
+          DOWNLOAD COURSE BROCHURE
+        </button>
+      </div>
+      <div class="bg-gradient-to-br from-teal-50 to-blue-50 rounded-3xl p-12 shadow-xl">
+        <img id="programsImage" src="" class="w-full" alt="Training Programs" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Rest of your sections (Upcoming Classes, Double Impact, CTA, Footer) remain static or can be made editable later -->
+
+  <!-- Upcoming Classes -->
+  <section class="py-16 bg-black text-white text-center">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-4xl font-bold mb-4">
+        UPCOMING <span class="bg-gradient-to-r text-transparent from-teal-500 bg-clip-text to-green-400">CLASSES</span>
+      </h2>
+      <p class="text-lg mb-10">Ready to level up? Check out our schedule for the latest PMP, Agile, and AI workshops.</p>
+      <a href="#" class="bg-primary text-white px-10 py-5 rounded-md text-lg font-medium hover:bg-primary/90 transition inline-block">VIEW CLASS SCHEDULE →</a>
+    </div>
+  </section>
+
+  <!-- Double Impact Advantage, CTA, Footer remain unchanged (add IDs if you want to edit them later) -->
+
+  <!-- Footer -->
+  <footer class="bg-black text-white pt-16 pb-8 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div>
+          <div class="text-4xl font-bold mb-6">IMPACT</div>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            We bring value that has strong impact to the organization & individual through Consultancy, Training, and Digital Execution.
+          </p>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-6 uppercase tracking-wider">SERVICES</h4>
+          <ul class="space-y-4 text-gray-400 text-sm">
+            <li>Consultancy PM & AI</li>
+            <li>Corporate Training</li>
+            <li>Digital Execution</li>
+            <li>Business Process Reengineering</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-6 uppercase tracking-wider">COMPANY</h4>
+          <ul class="space-y-4 text-gray-400 text-sm">
+            <li>About Us</li>
+            <li>Contact</li>
+            <li>Careers</li>
+            <li>Privacy Policy</li>
+          </ul>
+        </div>
+        <div class="flex flex-col justify-between">
+          <div class="flex space-x-4 mb-8">
+            <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-linkedin text-2xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white transition"><i class="bi bi-twitter-x text-2xl"></i></a>
+          </div>
+          <div class="text-sm text-gray-500">
+            © 2025 Impact. All rights reserved.<br />
+            <span>HRDC Training Provider Certified</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

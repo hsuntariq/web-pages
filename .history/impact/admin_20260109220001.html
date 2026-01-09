@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMPACT - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#00C4B4", accent: "#122F87" },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .sidebar-link {
+        transition: all 0.3s;
+      }
+      .sidebar-link:hover {
+        background-color: #f0f9f8;
+        transform: translateX(8px);
+      }
+      .sidebar-link.active {
+        background-color: #e0f7f5;
+        font-weight: 600;
+      }
+      .section-content {
+        display: none;
+      }
+      .section-content.active {
+        display: block;
+      }
+    </style>
+
+    <!-- Cloudinary Widget -->
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
+        authDomain: "webpages-a48d0.firebaseapp.com",
+        projectId: "webpages-a48d0",
+        storageBucket: "webpages-a48d0.firebasestorage.app",
+        messagingSenderId: "1048841699970",
+        appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
+        measurementId: "G-FFJWNXHE0S",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentData = {};
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          document.getElementById("loginForm").classList.add("hidden");
+          document.getElementById("adminPanel").classList.remove("hidden");
+          document.getElementById("userEmail").textContent = user.email;
+          loadContent();
+        } else {
+          document.getElementById("loginForm").classList.remove("hidden");
+          document.getElementById("adminPanel").classList.add("hidden");
+        }
+      });
+
+      window.login = async () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        if (!email || !password)
+          return alert("Please enter email and password");
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          alert(
+            "Login failed: " +
+              (err.code === "auth/wrong-password" ||
+              err.code === "auth/user-not-found"
+                ? "Invalid credentials"
+                : err.message)
+          );
+        }
+      };
+
+      window.logout = () => signOut(auth);
+
+      function loadContent() {
+        onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+          currentData = snap.exists() ? snap.data() : {};
+          populateAllFields();
+        });
+      }
+
+      function populateAllFields() {
+        document.getElementById("heroTitle1").value =
+          currentData.hero?.title1 || "";
+        document.getElementById("heroHighlight").value =
+          currentData.hero?.highlight || "";
+        document.getElementById("heroTitle3").value =
+          currentData.hero?.title3 || "";
+        document.getElementById("heroDesc").value =
+          currentData.hero?.description || "";
+        document.getElementById("heroImage").value =
+          currentData.hero?.image || "";
+        document.getElementById("hrdcLogo").value =
+          currentData.hero?.hrdcLogo || "";
+
+        document.getElementById("coreTitle").value =
+          currentData.core?.title || "";
+        document.getElementById("coreSubtitle").value =
+          currentData.core?.subtitle || "";
+        document.getElementById("consultancyTitle").value =
+          currentData.core?.consultancy?.title || "";
+        document.getElementById("consultancyItems").value = (
+          currentData.core?.consultancy?.items || []
+        ).join("\n");
+        document.getElementById("trainingTitle").value =
+          currentData.core?.training?.title || "";
+        document.getElementById("trainingDesc").value =
+          currentData.core?.training?.description || "";
+        document.getElementById("trainingTags").value = (
+          currentData.core?.training?.tags || []
+        ).join(", ");
+        document.getElementById("digitalTitle").value =
+          currentData.core?.digital?.title || "";
+        document.getElementById("digitalItems").value = (
+          currentData.core?.digital?.items || []
+        ).join("\n");
+
+        document.getElementById("programsTitle").value =
+          currentData.programs?.title || "";
+        document.getElementById("programsDesc").value =
+          currentData.programs?.description || "";
+        document.getElementById("programsImage").value =
+          currentData.programs?.image || "";
+
+        document.getElementById("upcomingTitle").value =
+          currentData.upcoming?.title || "";
+        document.getElementById("upcomingHighlight").value =
+          currentData.upcoming?.highlight || "";
+        document.getElementById("upcomingDesc").value =
+          currentData.upcoming?.description || "";
+        document.getElementById("upcomingButton").value =
+          currentData.upcoming?.buttonText || "";
+
+        document.getElementById("doubleTitle").value =
+          currentData.doubleImpact?.title || "";
+        document.getElementById("doubleSubtitle").value =
+          currentData.doubleImpact?.subtitle || "";
+        document.getElementById("feature1Title").value =
+          currentData.doubleImpact?.feature1?.title || "";
+        document.getElementById("feature1Desc").value =
+          currentData.doubleImpact?.feature1?.desc || "";
+        document.getElementById("feature2Title").value =
+          currentData.doubleImpact?.feature2?.title || "";
+        document.getElementById("feature2Desc").value =
+          currentData.doubleImpact?.feature2?.desc || "";
+        document.getElementById("feature3Title").value =
+          currentData.doubleImpact?.feature3?.title || "";
+        document.getElementById("feature3Desc").value =
+          currentData.doubleImpact?.feature3?.desc || "";
+        document.getElementById("testimonialTitle").value =
+          currentData.doubleImpact?.testimonialTitle || "";
+        document.getElementById("testimonialSubtitle").value =
+          currentData.doubleImpact?.testimonialSubtitle || "";
+        document.getElementById("quote1").value =
+          currentData.doubleImpact?.quote1 || "";
+        document.getElementById("author1").value =
+          currentData.doubleImpact?.author1 || "";
+        document.getElementById("quote2").value =
+          currentData.doubleImpact?.quote2 || "";
+        document.getElementById("author2").value =
+          currentData.doubleImpact?.author2 || "";
+
+        document.getElementById("ctaTitle").value =
+          currentData.cta?.title || "";
+        document.getElementById("ctaHighlight").value =
+          currentData.cta?.highlight || "";
+        document.getElementById("ctaDesc").value =
+          currentData.cta?.description || "";
+        document.getElementById("ctaButton1").value =
+          currentData.cta?.button1 || "";
+        document.getElementById("ctaButton2").value =
+          currentData.cta?.button2 || "";
+
+        document.getElementById("footerDesc").value =
+          currentData.footer?.description || "";
+        document.getElementById("footerServices").value = (
+          currentData.footer?.services || []
+        ).join("\n");
+        document.getElementById("footerCompany").value = (
+          currentData.footer?.company || []
+        ).join("\n");
+      }
+
+      window.saveAll = async () => {
+        const data = {
+          hero: {
+            title1: document.getElementById("heroTitle1")?.value.trim() || "",
+            highlight:
+              document.getElementById("heroHighlight")?.value.trim() || "",
+            title3: document.getElementById("heroTitle3")?.value.trim() || "",
+            description:
+              document.getElementById("heroDesc")?.value.trim() || "",
+            image: document.getElementById("heroImage")?.value.trim() || "",
+            hrdcLogo: document.getElementById("hrdcLogo")?.value.trim() || "",
+          },
+          core: {
+            title: document.getElementById("coreTitle")?.value.trim() || "",
+            subtitle:
+              document.getElementById("coreSubtitle")?.value.trim() || "",
+            consultancy: {
+              title:
+                document.getElementById("consultancyTitle")?.value.trim() || "",
+              items: document
+                .getElementById("consultancyItems")
+                ?.value.split("\n")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+            training: {
+              title:
+                document.getElementById("trainingTitle")?.value.trim() || "",
+              description:
+                document.getElementById("trainingDesc")?.value.trim() || "",
+              tags: document
+                .getElementById("trainingTags")
+                ?.value.split(",")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+            digital: {
+              title:
+                document.getElementById("digitalTitle")?.value.trim() || "",
+              items: document
+                .getElementById("digitalItems")
+                ?.value.split("\n")
+                .map((s) => s.trim())
+                .filter((s) => s),
+            },
+          },
+          programs: {
+            title: document.getElementById("programsTitle")?.value.trim() || "",
+            description:
+              document.getElementById("programsDesc")?.value.trim() || "",
+            image: document.getElementById("programsImage")?.value.trim() || "",
+          },
+          upcoming: {
+            title: document.getElementById("upcomingTitle")?.value.trim() || "",
+            highlight:
+              document.getElementById("upcomingHighlight")?.value.trim() || "",
+            description:
+              document.getElementById("upcomingDesc")?.value.trim() || "",
+            buttonText:
+              document.getElementById("upcomingButton")?.value.trim() || "",
+          },
+          doubleImpact: {
+            title: document.getElementById("doubleTitle")?.value.trim() || "",
+            subtitle:
+              document.getElementById("doubleSubtitle")?.value.trim() || "",
+            feature1: {
+              title:
+                document.getElementById("feature1Title")?.value.trim() || "",
+              desc: document.getElementById("feature1Desc")?.value.trim() || "",
+            },
+            feature2: {
+              title:
+                document.getElementById("feature2Title")?.value.trim() || "",
+              desc: document.getElementById("feature2Desc")?.value.trim() || "",
+            },
+            feature3: {
+              title:
+                document.getElementById("feature3Title")?.value.trim() || "",
+              desc: document.getElementById("feature3Desc")?.value.trim() || "",
+            },
+            testimonialTitle:
+              document.getElementById("testimonialTitle")?.value.trim() || "",
+            testimonialSubtitle:
+              document.getElementById("testimonialSubtitle")?.value.trim() ||
+              "",
+            quote1: document.getElementById("quote1")?.value.trim() || "",
+            author1: document.getElementById("author1")?.value.trim() || "",
+            quote2: document.getElementById("quote2")?.value.trim() || "",
+            author2: document.getElementById("author2")?.value.trim() || "",
+          },
+          cta: {
+            title: document.getElementById("ctaTitle")?.value.trim() || "",
+            highlight:
+              document.getElementById("ctaHighlight")?.value.trim() || "",
+            description: document.getElementById("ctaDesc")?.value.trim() || "",
+            button1: document.getElementById("ctaButton1")?.value.trim() || "",
+            button2: document.getElementById("ctaButton2")?.value.trim() || "",
+          },
+          footer: {
+            description:
+              document.getElementById("footerDesc")?.value.trim() || "",
+            services: document
+              .getElementById("footerServices")
+              ?.value.split("\n")
+              .map((s) => s.trim())
+              .filter((s) => s),
+            company: document
+              .getElementById("footerCompany")
+              ?.value.split("\n")
+              .map((s) => s.trim())
+              .filter((s) => s),
+          },
+        };
+
+        try {
+          await setDoc(doc(db, "siteContent", "main"), data, { merge: true }); // ← IMPORTANT: merge keeps old values
+          alert(
+            "✅ Changes saved successfully! Only modified fields were updated."
+          );
+          document
+            .getElementById("previewFrame")
+            .contentWindow.location.reload();
+        } catch (e) {
+          alert("❌ Save failed: " + e.message);
+        }
+      };
+
+      window.openUploader = (fieldId) => {
+        cloudinary
+          .createUploadWidget(
+            {
+              cloudName: "YOUR_CLOUDINARY_CLOUD_NAME", // ← REPLACE THIS
+              uploadPreset: "impact_unsigned",
+              cropping: true,
+              folder: "impact-site",
+            },
+            (error, result) => {
+              if (!error && result && result.event === "success") {
+                document.getElementById(fieldId).value = result.info.secure_url;
+                alert("Image uploaded!");
+              }
+            }
+          )
+          .open();
+      };
+
+      // Sidebar navigation
+      function openSection(sectionId) {
+        document
+          .querySelectorAll(".section-content")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".sidebar-link")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+        document
+          .querySelector(`[onclick="openSection('${sectionId}')"]`)
+          .classList.add("active");
+      }
+    </script>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Login -->
+    <div
+      id="loginForm"
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-accent to-black"
+    >
+      <div class="bg-white p-12 rounded-3xl shadow-2xl w-96 text-center">
+        <h1 class="text-5xl font-bold text-accent mb-10">ADMIN LOGIN</h1>
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full p-4 mb-4 border-2 rounded-xl focus:border-primary"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-4 mb-8 border-2 rounded-xl focus:border-primary"
+        />
+        <button
+          onclick="login()"
+          class="w-full bg-primary text-white py-5 rounded-xl text-xl font-bold hover:bg-primary/90"
+        >
+          LOGIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden h-screen flex">
+      <!-- Sidebar -->
+      <div
+        class="w-80 bg-white shadow-xl overflow-y-auto border-r border-gray-200"
+      >
+        <div class="p-8 border-b">
+          <h1 class="text-3xl font-bold text-accent">IMPACT Admin</h1>
+          <p class="text-sm text-gray-600 mt-2">
+            Logged in as: <span id="userEmail" class="font-bold"></span>
+          </p>
+          <button
+            onclick="logout()"
+            class="mt-6 w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
+        <nav class="p-4">
+          <ul class="space-y-2">
+            <li>
+              <a
+                href="#"
+                onclick="openSection('heroSection'); return false;"
+                class="sidebar-link active block py-4 px-6 rounded-lg"
+                >1. Hero Section</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('coreSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >2. Core Capabilities</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('programsSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >3. Certified Programs</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('upcomingSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >4. Upcoming Classes</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('doubleSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >5. Double Impact</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('ctaSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >6. Call to Action</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                onclick="openSection('footerSection'); return false;"
+                class="sidebar-link block py-4 px-6 rounded-lg"
+                >7. Footer</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex">
+        <!-- Editor -->
+        <div class="w-1/2 overflow-y-auto bg-gray-50 p-10 space-y-10">
+          <!-- Hero -->
+          <div
+            id="heroSection"
+            class="section-content active bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">Hero Section</h2>
+            <div class="space-y-6">
+              <input
+                id="heroTitle1"
+                class="w-full p-4 border rounded-lg"
+                placeholder="IMPACT"
+              />
+              <input
+                id="heroHighlight"
+                class="w-full p-4 border rounded-lg"
+                placeholder="THROUGH"
+              />
+              <input
+                id="heroTitle3"
+                class="w-full p-4 border rounded-lg"
+                placeholder="EXECUTION"
+              />
+              <textarea
+                id="heroDesc"
+                class="w-full p-4 border rounded-lg h-40"
+              ></textarea>
+              <div class="grid grid-cols-2 gap-6">
+                <div>
+                  <input
+                    id="heroImage"
+                    class="w-full p-4 border rounded-lg"
+                    placeholder="Hero Image URL"
+                  />
+                  <button
+                    onclick="openUploader('heroImage')"
+                    class="mt-2 w-full bg-primary text-white py-3 rounded-lg"
+                  >
+                    Upload Hero Image
+                  </button>
+                </div>
+                <div>
+                  <input
+                    id="hrdcLogo"
+                    class="w-full p-4 border rounded-lg"
+                    placeholder="HRDC Logo URL"
+                  />
+                  <button
+                    onclick="openUploader('hrdcLogo')"
+                    class="mt-2 w-full bg-primary text-white py-3 rounded-lg"
+                  >
+                    Upload HRDC Logo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Core Capabilities -->
+          <div
+            id="coreSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">
+              Core Capabilities
+            </h2>
+            <input id="coreTitle" class="w-full p-4 border rounded-lg mb-6" />
+            <textarea
+              id="coreSubtitle"
+              class="w-full p-4 border rounded-lg h-32 mb-10"
+            ></textarea>
+            <div class="grid grid-cols-3 gap-8">
+              <div>
+                <h3 class="font-bold text-xl mb-4">Consultancy</h3>
+                <input
+                  id="consultancyTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="consultancyItems"
+                  class="w-full p-4 border rounded-lg h-48"
+                  placeholder="One per line"
+                ></textarea>
+              </div>
+              <div>
+                <h3 class="font-bold text-xl mb-4">Training</h3>
+                <input
+                  id="trainingTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="trainingDesc"
+                  class="w-full p-4 border rounded-lg h-32 mb-4"
+                ></textarea>
+                <input
+                  id="trainingTags"
+                  class="w-full p-4 border rounded-lg"
+                  placeholder="Comma separated"
+                />
+              </div>
+              <div>
+                <h3 class="font-bold text-xl mb-4">Digital Execution</h3>
+                <input
+                  id="digitalTitle"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="digitalItems"
+                  class="w-full p-4 border rounded-lg h-48"
+                  placeholder="One per line"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Other sections follow the same clean pattern -->
+          <div
+            id="programsSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">
+              Certified Training Programs
+            </h2>
+            <input
+              id="programsTitle"
+              class="w-full p-4 border rounded-lg mb-6"
+            />
+            <textarea
+              id="programsDesc"
+              class="w-full p-4 border rounded-lg h-40 mb-6"
+            ></textarea>
+            <input
+              id="programsImage"
+              class="w-full p-4 border rounded-lg mb-4"
+              placeholder="Image URL"
+            />
+            <button
+              onclick="openUploader('programsImage')"
+              class="w-full bg-primary text-white py-4 rounded-lg"
+            >
+              Upload Image
+            </button>
+          </div>
+
+          <div
+            id="upcomingSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">
+              Upcoming Classes
+            </h2>
+            <input
+              id="upcomingTitle"
+              class="w-full p-4 border rounded-lg mb-4"
+            />
+            <input
+              id="upcomingHighlight"
+              class="w-full p-4 border rounded-lg mb-4"
+            />
+            <textarea
+              id="upcomingDesc"
+              class="w-full p-4 border rounded-lg h-32 mb-4"
+            ></textarea>
+            <input id="upcomingButton" class="w-full p-4 border rounded-lg" />
+          </div>
+
+          <div
+            id="doubleSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">
+              Double Impact Advantage
+            </h2>
+            <input id="doubleTitle" class="w-full p-4 border rounded-lg mb-6" />
+            <textarea
+              id="doubleSubtitle"
+              class="w-full p-4 border rounded-lg h-32 mb-8"
+            ></textarea>
+            <div class="grid grid-cols-3 gap-8 mb-10">
+              <div>
+                <input
+                  id="feature1Title"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="feature1Desc"
+                  class="w-full p-4 border rounded-lg h-40"
+                ></textarea>
+              </div>
+              <div>
+                <input
+                  id="feature2Title"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="feature2Desc"
+                  class="w-full p-4 border rounded-lg h-40"
+                ></textarea>
+              </div>
+              <div>
+                <input
+                  id="feature3Title"
+                  class="w-full p-4 border rounded-lg mb-4"
+                />
+                <textarea
+                  id="feature3Desc"
+                  class="w-full p-4 border rounded-lg h-40"
+                ></textarea>
+              </div>
+            </div>
+            <h3 class="text-2xl font-bold mb-6">Testimonials</h3>
+            <input
+              id="testimonialTitle"
+              class="w-full p-4 border rounded-lg mb-4"
+            />
+            <input
+              id="testimonialSubtitle"
+              class="w-full p-4 border rounded-lg mb-6"
+            />
+            <textarea
+              id="quote1"
+              class="w-full p-4 border rounded-lg h-32 mb-4"
+            ></textarea>
+            <input id="author1" class="w-full p-4 border rounded-lg mb-6" />
+            <textarea
+              id="quote2"
+              class="w-full p-4 border rounded-lg h-32 mb-4"
+            ></textarea>
+            <input id="author2" class="w-full p-4 border rounded-lg" />
+          </div>
+
+          <div
+            id="ctaSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">Call to Action</h2>
+            <input id="ctaTitle" class="w-full p-4 border rounded-lg mb-4" />
+            <input
+              id="ctaHighlight"
+              class="w-full p-4 border rounded-lg mb-4"
+            />
+            <textarea
+              id="ctaDesc"
+              class="w-full p-4 border rounded-lg h-40 mb-6"
+            ></textarea>
+            <input id="ctaButton1" class="w-full p-4 border rounded-lg mb-4" />
+            <input id="ctaButton2" class="w-full p-4 border rounded-lg" />
+          </div>
+
+          <div
+            id="footerSection"
+            class="section-content bg-white rounded-2xl shadow-lg p-10"
+          >
+            <h2 class="text-3xl font-bold text-accent mb-8">Footer</h2>
+            <textarea
+              id="footerDesc"
+              class="w-full p-4 border rounded-lg h-40 mb-8"
+            ></textarea>
+            <h3 class="text-xl font-bold mb-4">Services Links</h3>
+            <textarea
+              id="footerServices"
+              class="w-full p-4 border rounded-lg h-40 mb-8"
+              placeholder="One per line"
+            ></textarea>
+            <h3 class="text-xl font-bold mb-4">Company Links</h3>
+            <textarea
+              id="footerCompany"
+              class="w-full p-4 border rounded-lg h-40"
+              placeholder="One per line"
+            ></textarea>
+          </div>
+
+          <!-- Fixed Save Button -->
+          <div class="fixed bottom-10 left-96 z-50">
+            <button
+              onclick="saveAll()"
+              class="bg-green-600 hover:bg-green-700 text-white px-16 py-6 rounded-2xl text-3xl font-bold shadow-2xl transition transform hover:scale-105"
+            >
+              SAVE CHANGES
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="w-1/2 bg-white border-l-4 border-primary flex flex-col">
+          <div
+            class="bg-primary text-white text-center py-6 text-2xl font-bold"
+          >
+            LIVE PREVIEW
+          </div>
+          <iframe
+            id="previewFrame"
+            src="index.html"
+            class="flex-1 w-full"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

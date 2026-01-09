@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IMPACT - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#00C4B4", accent: "#122F87" },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+      }
+      .sidebar-link {
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      .sidebar-link:hover {
+        background-color: #f0f9f8;
+        transform: translateX(8px);
+      }
+      .sidebar-link.active {
+        background-color: #d0f0ee;
+        font-weight: 600;
+        border-left: 4px solid #00c4b4;
+      }
+      .section-content {
+        display: none;
+      }
+      .section-content.active {
+        display: block;
+      }
+      #mobileMenuBtn {
+        display: none;
+      }
+      #overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 50;
+      }
+      @media (max-width: 1024px) {
+        #mobileMenuBtn {
+          display: block;
+        }
+        #sidebar {
+          position: fixed;
+          left: -100%;
+          top: 0;
+          height: 100%;
+          width: 320px;
+          z-index: 60;
+          transition: left 0.3s ease;
+          background: white;
+        }
+        #sidebar.open {
+          left: 0;
+        }
+        #overlay.open {
+          display: block;
+        }
+      }
+    </style>
+
+    <!-- Cloudinary -->
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
+    <!-- Firebase -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
+        authDomain: "webpages-a48d0.firebaseapp.com",
+        projectId: "webpages-a48d0",
+        storageBucket: "webpages-a48d0.firebasestorage.app",
+        messagingSenderId: "1048841699970",
+        appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
+        measurementId: "G-FFJWNXHE0S",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const auth = getAuth(app);
+
+      let currentData = {};
+
+      const initialData = {
+        hero: {
+          title1: "IMPACT",
+          highlight: "THROUGH",
+          title3: "EXECUTION",
+          description:
+            "We bring value that has strong impact to the organization & individual through Consultancy, Training, and Digital Execution.",
+          image: "./hero.PNG",
+          hrdcLogo:
+            "https://precisionwellness.my/wp-content/uploads/2025/06/HRDC_Claimable_Registered_Training_Provider_Logos-scaled.webp",
+        },
+        core: {
+          title: "CORE CAPABILITIES",
+          subtitle:
+            "Comprehensive solutions designed to transform your business operations and empower your workforce.",
+          consultancy: {
+            title: "CONSULTANCY PM & AI",
+            items: [
+              "Agentic AI Implementation",
+              "PMO Setup & Optimization",
+              "Business Process Reengineering",
+              "Project Execution Strategy",
+            ],
+          },
+          training: {
+            title: "TRAINING",
+            description:
+              "Empower your team with industry-recognized certifications and practical skills.",
+            tags: [
+              "PMP",
+              "CAPM",
+              "Agile",
+              "PMC-CP",
+              "Lean & Sigma",
+              "Power BI",
+            ],
+          },
+          digital: {
+            title: "DIGITAL EXECUTION",
+            items: [
+              "Digital Transformation",
+              "Automation Workflows",
+              "Data Analytics Solutions",
+            ],
+          },
+        },
+        programs: {
+          title: "CERTIFIED TRAINING PROGRAMS",
+          description:
+            "We are an HRDC Training Provider offering a wide range of certification and non-certification courses designed to elevate professional capabilities.",
+          image: "./programs.PNG",
+        },
+        upcomingClasses: [], // will be array of objects
+        testimonials: [],
+        social: { linkedin: "", twitter: "", facebook: "", instagram: "" },
+        upcoming: {
+          title: "UPCOMING",
+          highlight: "CLASSES",
+          description:
+            "Ready to level up? Check out our schedule for the latest PMP, Agile, and AI workshops.",
+          buttonText: "VIEW CLASS SCHEDULE →",
+        },
+        doubleImpact: {
+          /* ... your full doubleImpact object ... */
+        },
+        cta: {
+          title: "READY TO MAKE AN IMPACT?",
+          highlight: "IMPACT",
+          description:
+            "Let's discuss how our consultancy and training solutions can drive<br />your organization forward.",
+          button1: "GET IN TOUCH",
+          button2: "VIEW CASE STUDIES",
+        },
+        footer: {
+          description:
+            "We bring value that has strong impact to the organization &<br />individual through Consultancy, Training, and Digital<br />Execution.",
+          services: [
+            "Consultancy PM & AI",
+            "Corporate Training",
+            "Digital Execution",
+            "Business Process Reengineering",
+          ],
+          company: ["About Us", "Contact", "Careers", "Privacy Policy"],
+        },
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          document.getElementById("loginForm").classList.add("hidden");
+          document.getElementById("adminPanel").classList.remove("hidden");
+          document.getElementById("userEmail").textContent = user.email;
+          loadContent();
+        } else {
+          document.getElementById("loginForm").classList.remove("hidden");
+          document.getElementById("adminPanel").classList.add("hidden");
+        }
+      });
+
+      window.login = async () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        if (!email || !password) return alert("Email and password required");
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err) {
+          alert("Login failed: Invalid credentials");
+        }
+      };
+
+      window.logout = () => signOut(auth);
+
+      function loadContent() {
+        onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+          currentData = snap.exists() ? snap.data() : {};
+          populateAllFields();
+          renderUpcomingClasses();
+          renderTestimonials();
+        });
+      }
+
+      function populateAllFields() {
+        const set = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val || "";
+        };
+
+        // Hero, Core, Programs, Upcoming text, Double Impact, CTA, Footer — same as before
+        // ... (keep all previous set calls)
+
+        // Social Links
+        set("socialLinkedIn", currentData.social?.linkedin || "");
+        set("socialTwitter", currentData.social?.twitter || "");
+        set("socialFacebook", currentData.social?.facebook || "");
+        set("socialInstagram", currentData.social?.instagram || "");
+      }
+
+      // Save individual section
+      window.saveSection = async (sectionName) => {
+        let sectionData = {};
+        if (sectionName === "hero") {
+          sectionData.hero = {
+            title1: get("heroTitle1"),
+            highlight: get("heroHighlight"),
+            title3: get("heroTitle3"),
+            description: get("heroDesc"),
+            image: get("heroImage"),
+            hrdcLogo: get("hrdcLogo"),
+          };
+        } else if (sectionName === "social") {
+          sectionData.social = {
+            linkedin: get("socialLinkedIn"),
+            twitter: get("socialTwitter"),
+            facebook: get("socialFacebook"),
+            instagram: get("socialInstagram"),
+          };
+        } else if (sectionName === "upcomingClasses") {
+          const classes = [];
+          document.querySelectorAll(".class-entry").forEach((entry) => {
+            classes.push({
+              date: entry.querySelector(".class-date").value,
+              title: entry.querySelector(".class-title").value,
+              time: entry.querySelector(".class-time").value,
+              link: entry.querySelector(".class-link").value,
+            });
+          });
+          sectionData.upcomingClasses = classes;
+        } else if (sectionName === "testimonials") {
+          const testimonials = [];
+          document.querySelectorAll(".testimonial-entry").forEach((entry) => {
+            testimonials.push({
+              quote: entry.querySelector(".testimonial-quote").value,
+              author: entry.querySelector(".testimonial-author").value,
+              rating: entry.querySelector(".testimonial-rating").value || 5,
+            });
+          });
+          sectionData.testimonials = testimonials;
+        }
+        // Add other sections as needed
+
+        try {
+          await setDoc(doc(db, "siteContent", "main"), sectionData, {
+            merge: true,
+          });
+          alert(`${sectionName} saved!`);
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      };
+
+      window.resetAllData = async () => {
+        if (!confirm("Are you sure? This will reset ALL content to original."))
+          return;
+        try {
+          await setDoc(doc(db, "siteContent", "main"), initialData);
+          alert("All data reset to initial values!");
+          loadContent();
+        } catch (e) {
+          alert("Reset failed: " + e.message);
+        }
+      };
+
+      // Dynamic Upcoming Classes
+      window.addClass = () => {
+        const container = document.getElementById("upcomingClassesList");
+        const entry = document.createElement("div");
+        entry.className = "class-entry bg-gray-50 p-6 rounded-xl mb-6";
+        entry.innerHTML = `
+        <input class="class-date w-full p-3 border rounded mb-3" placeholder="Date (e.g. Jan 15, 2026)" />
+        <input class="class-title w-full p-3 border rounded mb-3" placeholder="Class Title" />
+        <input class="class-time w-full p-3 border rounded mb-3" placeholder="Time (e.g. 9:00 AM - 5:00 PM)" />
+        <input class="class-link w-full p-3 border rounded mb-3" placeholder="Registration Link (optional)" />
+        <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-4 py-2 rounded">Remove</button>
+      `;
+        container.appendChild(entry);
+      };
+
+      function renderUpcomingClasses() {
+        const container = document.getElementById("upcomingClassesList");
+        container.innerHTML = "";
+        (currentData.upcomingClasses || []).forEach((cls) => {
+          const entry = document.createElement("div");
+          entry.className = "class-entry bg-gray-50 p-6 rounded-xl mb-6";
+          entry.innerHTML = `
+          <input class="class-date w-full p-3 border rounded mb-3" value="${
+            cls.date || ""
+          }" placeholder="Date" />
+          <input class="class-title w-full p-3 border rounded mb-3" value="${
+            cls.title || ""
+          }" placeholder="Title" />
+          <input class="class-time w-full p-3 border rounded mb-3" value="${
+            cls.time || ""
+          }" placeholder="Time" />
+          <input class="class-link w-full p-3 border rounded mb-3" value="${
+            cls.link || ""
+          }" placeholder="Link" />
+          <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-4 py-2 rounded">Remove</button>
+        `;
+          container.appendChild(entry);
+        });
+      }
+
+      // Dynamic Testimonials
+      window.addTestimonial = () => {
+        const container = document.getElementById("testimonialsList");
+        const entry = document.createElement("div");
+        entry.className = "testimonial-entry bg-gray-50 p-6 rounded-xl mb-6";
+        entry.innerHTML = `
+        <textarea class="testimonial-quote w-full p-4 border rounded h-32 mb-4" placeholder="Quote"></textarea>
+        <input class="testimonial-author w-full p-4 border rounded mb-4" placeholder="Author Name" />
+        <input class="testimonial-rating w-full p-4 border rounded mb-4" type="number" min="1" max="5" placeholder="Rating (1-5)" value="5" />
+        <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-4 py-2 rounded">Remove</button>
+      `;
+        container.appendChild(entry);
+      };
+
+      function renderTestimonials() {
+        const container = document.getElementById("testimonialsList");
+        container.innerHTML = "";
+        (currentData.testimonials || []).forEach((t) => {
+          const entry = document.createElement("div");
+          entry.className = "testimonial-entry bg-gray-50 p-6 rounded-xl mb-6";
+          entry.innerHTML = `
+          <textarea class="testimonial-quote w-full p-4 border rounded h-32 mb-4">${
+            t.quote || ""
+          }</textarea>
+          <input class="testimonial-author w-full p-4 border rounded mb-4" value="${
+            t.author || ""
+          }" />
+          <input class="testimonial-rating w-full p-4 border rounded mb-4" type="number" min="1" max="5" value="${
+            t.rating || 5
+          }" />
+          <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-4 py-2 rounded">Remove</button>
+        `;
+          container.appendChild(entry);
+        });
+      }
+
+      const get = (id) => document.getElementById(id)?.value.trim() || "";
+
+      window.openSection = (id) => {
+        document
+          .querySelectorAll(".section-content")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".sidebar-link")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        document
+          .querySelector(`.sidebar-link[onclick*="${id}"]`)
+          .classList.add("active");
+        if (window.innerWidth < 1024) toggleMobileMenu();
+      };
+
+      window.toggleMobileMenu = () => {
+        document.getElementById("sidebar").classList.toggle("open");
+        document.getElementById("overlay").classList.toggle("open");
+      };
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="overlay" onclick="toggleMobileMenu()"></div>
+
+    <!-- Login -->
+    <div
+      id="loginForm"
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br from-accent to-black p-4"
+    >
+      <div
+        class="bg-white p-12 rounded-3xl shadow-2xl w-full max-w-md text-center"
+      >
+        <h1 class="text-5xl font-bold text-primary mb-12">IMPACT ADMIN</h1>
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full p-5 mb-6 border-2 rounded-xl text-lg"
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-5 mb-10 border-2 rounded-xl text-lg"
+        />
+        <button
+          onclick="login()"
+          class="w-full bg-primary text-white py-6 rounded-xl text-2xl font-bold"
+        >
+          LOGIN
+        </button>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="hidden h-screen flex">
+      <button
+        id="mobileMenuBtn"
+        onclick="toggleMobileMenu()"
+        class="fixed top-4 left-4 z-70 bg-accent text-white p-4 rounded-lg shadow-lg"
+      >
+        <svg
+          class="w-8 h-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
+      <!-- Sidebar -->
+      <div
+        id="sidebar"
+        class="w-full lg:w-80 bg-white border-r border-gray-300 shadow-xl overflow-y-auto"
+      >
+        <div class="p-8 bg-gradient-to-b from-accent to-primary text-white">
+          <h1 class="text-3xl font-bold">IMPACT Admin</h1>
+          <p class="mt-3 opacity-90">Logged in as:</p>
+          <p id="userEmail" class="font-bold text-xl mt-1"></p>
+          <button
+            onclick="logout()"
+            class="mt-8 w-full bg-white text-accent py-3 rounded-lg font-bold"
+          >
+            Logout
+          </button>
+        </div>
+        <nav class="p-6">
+          <ul class="space-y-3">
+            <li>
+              <div
+                onclick="openSection('heroSection')"
+                class="sidebar-link active py-5 px-6 rounded-xl text-lg"
+              >
+                1. Hero
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('coreSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                2. Core
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('programsSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                3. Programs
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('upcomingClassesSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                4. Upcoming Classes
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('testimonialsSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                5. Testimonials
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('socialSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                6. Social Links
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('ctaSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                7. CTA
+              </div>
+            </li>
+            <li>
+              <div
+                onclick="openSection('footerSection')"
+                class="sidebar-link py-5 px-6 rounded-xl text-lg"
+              >
+                8. Footer
+              </div>
+            </li>
+          </ul>
+          <div class="mt-10 p-6 bg-red-50 rounded-xl">
+            <button
+              onclick="resetAllData()"
+              class="w-full bg-red-600 text-white py-4 rounded-xl font-bold text-xl"
+            >
+              RESET ALL TO INITIAL
+            </button>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Editor -->
+      <div class="flex-1 overflow-y-auto p-8 lg:p-16 bg-gray-50">
+        <div class="max-w-5xl mx-auto space-y-12">
+          <!-- Your existing sections (heroSection, coreSection, etc.) remain the same -->
+
+          <!-- New: Upcoming Classes -->
+          <div
+            id="upcomingClassesSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-8">
+              Upcoming Classes
+            </h2>
+            <button
+              onclick="addClass()"
+              class="mb-6 bg-primary text-white py-3 px-6 rounded-xl font-bold"
+            >
+              + Add New Class
+            </button>
+            <div id="upcomingClassesList" class="space-y-6"></div>
+            <button
+              onclick="saveSection('upcomingClasses')"
+              class="mt-8 bg-green-600 text-white py-4 px-12 rounded-xl text-xl font-bold"
+            >
+              SAVE UPCOMING CLASSES
+            </button>
+          </div>
+
+          <!-- New: Testimonials -->
+          <div
+            id="testimonialsSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-8">Testimonials</h2>
+            <button
+              onclick="addTestimonial()"
+              class="mb-6 bg-primary text-white py-3 px-6 rounded-xl font-bold"
+            >
+              + Add Testimonial
+            </button>
+            <div id="testimonialsList" class="space-y-6"></div>
+            <button
+              onclick="saveSection('testimonials')"
+              class="mt-8 bg-green-600 text-white py-4 px-12 rounded-xl text-xl font-bold"
+            >
+              SAVE TESTIMONIALS
+            </button>
+          </div>
+
+          <!-- New: Social Links -->
+          <div
+            id="socialSection"
+            class="section-content bg-white rounded-3xl shadow-xl p-12"
+          >
+            <h2 class="text-4xl font-bold text-accent mb-8">Social Links</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <input
+                id="socialLinkedIn"
+                class="p-5 border-2 rounded-xl"
+                placeholder="LinkedIn URL"
+              />
+              <input
+                id="socialTwitter"
+                class="p-5 border-2 rounded-xl"
+                placeholder="Twitter/X URL"
+              />
+              <input
+                id="socialFacebook"
+                class="p-5 border-2 rounded-xl"
+                placeholder="Facebook URL"
+              />
+              <input
+                id="socialInstagram"
+                class="p-5 border-2 rounded-xl"
+                placeholder="Instagram URL"
+              />
+            </div>
+            <button
+              onclick="saveSection('social')"
+              class="mt-10 bg-green-600 text-white py-4 px-12 rounded-xl text-xl font-bold"
+            >
+              SAVE SOCIAL LINKS
+            </button>
+          </div>
+
+          <!-- Keep your other sections (hero, core, etc.) as before -->
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Schedule – IMPACT</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00C4B4",
+              accent: "#122F87",
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
+        authDomain: "webpages-a48d0.firebaseapp.com",
+        projectId: "webpages-a48d0",
+        storageBucket: "webpages-a48d0.firebasestorage.app",
+        messagingSenderId: "1048841699970",
+        appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
+        measurementId: "G-FFJWNXHE0S",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      onSnapshot(doc(db, "siteContent", "main"), (snap) => {
+        const data = snap.exists() ? snap.data() : {};
+        const classes = data.upcomingClasses || [];
+
+        const container = document.getElementById("classesTableBody");
+        container.innerHTML = "";
+
+        if (classes.length === 0) {
+          container.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">No upcoming classes scheduled yet.</td></tr>`;
+          return;
+        }
+
+        classes.forEach((cls) => {
+          const row = document.createElement("tr");
+          row.className = "border-b border-gray-200 hover:bg-gray-50";
+
+          let statusBadge = "";
+          if (cls.status === "limited") {
+            statusBadge =
+              '<span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">LIMITED SPOTS</span>';
+          } else if (cls.status === "open") {
+            statusBadge =
+              '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">OPEN</span>';
+          } else if (cls.status === "filling") {
+            statusBadge =
+              '<span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium">FILLING FAST</span>';
+          } else {
+            statusBadge =
+              '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">UPCOMING</span>';
+          }
+
+          let modeBadge = "";
+          if (cls.mode === "virtual-inperson") {
+            modeBadge =
+              '<span class="bg-teal-100 text-teal-800 px-3 py-1 rounded text-sm">Virtual / In-Person</span>';
+          } else if (cls.mode === "virtual") {
+            modeBadge =
+              '<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm">Virtual</span>';
+          } else if (cls.mode === "workshop") {
+            modeBadge =
+              '<span class="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm">Workshop</span>';
+          } else {
+            modeBadge =
+              '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm">In-Person</span>';
+          }
+
+          let actionButton = cls.link
+            ? `<a href="${cls.link}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition">REGISTER</a>`
+            : '<span class="text-gray-400 px-6 py-3">Coming Soon</span>';
+
+          row.innerHTML = `
+          <td class="py-6 px-4 font-medium text-gray-900">${
+            cls.title || ""
+          }</td>
+          <td class="py-6 px-4 text-gray-600">${cls.date || ""}</td>
+          <td class="py-6 px-4">${modeBadge}</td>
+          <td class="py-6 px-4">${statusBadge}</td>
+          <td class="py-6 px-4">${actionButton}</td>
+        `;
+          container.appendChild(row);
+        });
+      });
+    </script>
+  </head>
+  <body class="bg-gradient-to-b from-gray-50 to-white">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div
+        class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between"
+      >
+        <div class="text-3xl font-bold text-accent">IMPACT</div>
+        <a href="index.html" class="text-primary font-medium hover:underline"
+          >← Back to Home</a
+        >
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="py-20">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          TRAINING
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400"
+            >SCHEDULE</span
+          >
+        </h1>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-16">
+          Join our expert-led sessions and accelerate your career. Practical,
+          hands-on, and guaranteed to make an impact.
+        </p>
+
+        <div class="grid lg:grid-cols-3 gap-12 items-start">
+          <!-- Classes Table -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div class="bg-primary/10 px-8 py-6 border-b border-gray-200">
+                <h2
+                  class="text-2xl font-bold text-accent flex items-center gap-3"
+                >
+                  <i class="bi bi-calendar-event text-primary text-3xl"></i>
+                  PUBLIC CLASSES SCHEDULE
+                </h2>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th
+                        class="text-left py-4 px-6 font-semibold text-gray-700"
+                      >
+                        COURSE NAME
+                      </th>
+                      <th
+                        class="text-left py-4 px-6 font-semibold text-gray-700"
+                      >
+                        DATE
+                      </th>
+                      <th
+                        class="text-left py-4 px-6 font-semibold text-gray-700"
+                      >
+                        MODE
+                      </th>
+                      <th
+                        class="text-left py-4 px-6 font-semibold text-gray-700"
+                      >
+                        STATUS
+                      </th>
+                      <th
+                        class="text-left py-4 px-6 font-semibold text-gray-700"
+                      >
+                        ACTION
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="classesTableBody">
+                    <!-- Classes will be loaded here from Firebase -->
+                    <tr>
+                      <td colspan="5" class="text-center py-12 text-gray-500">
+                        Loading classes...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar: Brochure + Why Train -->
+          <div class="space-y-12">
+            <!-- Brochure -->
+            <div class="bg-primary/5 rounded-2xl p-8 shadow-lg">
+              <h3 class="text-2xl font-bold text-accent mb-4">
+                COURSE BROCHURE
+              </h3>
+              <p class="text-gray-600 mb-6">
+                Get the full details on our curriculum, pricing, and learning
+                outcomes.
+              </p>
+              <a
+                href="#"
+                class="block w-full bg-white border-2 border-primary text-primary text-center py-4 rounded-xl font-bold hover:bg-primary hover:text-white transition"
+              >
+                DOWNLOAD PDF ↓
+              </a>
+            </div>
+
+            <!-- Why Train With Us -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+              <h3 class="text-2xl font-bold text-accent mb-6">
+                WHY TRAIN WITH US?
+              </h3>
+              <ul class="space-y-4 text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i
+                    class="bi bi-check-circle-fill text-primary text-xl mt-1"
+                  ></i>
+                  <span>HRDC Certified Provider</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="bi bi-check-circle-fill text-primary text-xl mt-1"
+                  ></i>
+                  <span>100% PMP Passing Rate</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="bi bi-check-circle-fill text-primary text-xl mt-1"
+                  ></i>
+                  <span>AI-Powered Study Companion</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="bi bi-check-circle-fill text-primary text-xl mt-1"
+                  ></i>
+                  <span>Post-Class Coaching</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i
+                    class="bi bi-check-circle-fill text-primary text-xl mt-1"
+                  ></i>
+                  <span>Real-World Case Studies</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12 mt-20">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <p class="text-gray-400">
+          © 2026 IMPACT. All rights reserved. HRDC Certified Training Provider.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
