@@ -30,7 +30,6 @@
         font-family: "Inter", sans-serif;
       }
     </style>
-
     <!-- Firebase SDK -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -39,7 +38,6 @@
         doc,
         onSnapshot,
       } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
       const firebaseConfig = {
         apiKey: "AIzaSyA-GFK_aNREtLUfCmS_PRW9eIw-AUZjb14",
         authDomain: "webpages-a48d0.firebaseapp.com",
@@ -49,26 +47,20 @@
         appId: "1:1048841699970:web:be626e48ea25897ed72a9b",
         measurementId: "G-FFJWNXHE0S",
       };
-
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
-
       onSnapshot(doc(db, "siteContent", "main"), (snap) => {
         const data = snap.exists() ? snap.data() : {};
         const classes = data.upcomingClasses || [];
-
         const container = document.getElementById("classesTableBody");
         container.innerHTML = "";
-
         if (classes.length === 0) {
           container.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">No upcoming classes scheduled yet.</td></tr>`;
           return;
         }
-
         classes.forEach((cls) => {
           const row = document.createElement("tr");
           row.className = "border-b border-gray-200 hover:bg-gray-50";
-
           let statusBadge = "";
           if (cls.status === "limited") {
             statusBadge =
@@ -83,7 +75,6 @@
             statusBadge =
               '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">UPCOMING</span>';
           }
-
           let modeBadge = "";
           if (cls.mode === "virtual-inperson") {
             modeBadge =
@@ -98,11 +89,9 @@
             modeBadge =
               '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm">In-Person</span>';
           }
-
           let actionButton = cls.link
             ? `<a href="${cls.link}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition">REGISTER</a>`
             : '<span class="text-gray-400 px-6 py-3">Coming Soon</span>';
-
           row.innerHTML = `
           <td class="py-6 px-4 font-medium text-gray-900">${
             cls.title || ""
@@ -129,7 +118,6 @@
         >
       </div>
     </header>
-
     <!-- Main Content -->
     <section class="py-20">
       <div class="max-w-7xl mx-auto px-6 text-center">
@@ -144,7 +132,6 @@
           Join our expert-led sessions and accelerate your career. Practical,
           hands-on, and guaranteed to make an impact.
         </p>
-
         <div class="grid lg:grid-cols-3 gap-12 items-start">
           <!-- Classes Table -->
           <div class="lg:col-span-2">
@@ -200,7 +187,6 @@
               </div>
             </div>
           </div>
-
           <!-- Sidebar: Brochure + Why Train -->
           <div class="space-y-12">
             <!-- Brochure -->
@@ -219,7 +205,6 @@
                 DOWNLOAD PDF ↓
               </a>
             </div>
-
             <!-- Why Train With Us -->
             <div class="bg-white rounded-2xl p-8 shadow-lg">
               <h3 class="text-2xl font-bold text-accent mb-6">
@@ -262,7 +247,6 @@
         </div>
       </div>
     </section>
-
     <!-- Footer -->
     <footer class="bg-black text-white py-12 mt-20">
       <div class="max-w-7xl mx-auto px-6 text-center">
