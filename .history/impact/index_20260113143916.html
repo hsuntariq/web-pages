@@ -674,8 +674,9 @@
           <h2 id="programsTitle" class="text-4xl font-bold mb-6"></h2>
           <p id="programsDesc" class="text-gray-600 mb-8"></p>
           <a
-            href="#"
-            onclick="downloadFile('./2Impact PMP.pdf', 'Impact-PMP-Course-Brochure.pdf'); return false;"
+            href="2Impact-PMP.pdf"
+            download
+            id="brochureBtn"
             class="bg-gray-900 text-white px-8 py-4 mt-10 rounded-md font-medium hover:bg-gray-800 transition"
           >
             DOWNLOAD COURSE BROCHURE
@@ -903,31 +904,5 @@
         </div>
       </div>
     </footer>
-    <script>
-      function downloadFile(url, fileName) {
-        fetch(url)
-          .then((response) => {
-            if (!response.ok) throw new Error("File not found");
-            return response.blob();
-          })
-          .then((blob) => {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName || url.split("/").pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href); // clean up
-          })
-          .catch((error) => {
-            console.error("Download failed:", error);
-            alert(
-              "Sorry, could not download the file.\nPlease try right-click → Save link as..."
-            );
-            // Fallback: try opening in new tab
-            window.open(url, "_blank");
-          });
-      }
-    </script>
   </body>
 </html>

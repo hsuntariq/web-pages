@@ -212,11 +212,10 @@
                 Get the full details on our curriculum, pricing, and learning
                 outcomes.
               </p>
-
               <a
                 href="#"
                 onclick="downloadFile('./2Impact PMP.pdf', 'Impact-PMP-Course-Brochure.pdf'); return false;"
-                class="block w-full bg-white border-2 border-primary text-primary text-center py-4 rounded-xl font-bold hover:bg-primary hover:text-white transition"
+                class="bg-gray-900 text-white px-8 py-4 mt-10 rounded-md font-medium hover:bg-gray-800 transition"
               >
                 DOWNLOAD PDF ↓
               </a>
@@ -273,31 +272,5 @@
         </p>
       </div>
     </footer>
-    <script>
-      function downloadFile(url, fileName) {
-        fetch(url)
-          .then((response) => {
-            if (!response.ok) throw new Error("File not found");
-            return response.blob();
-          })
-          .then((blob) => {
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName || url.split("/").pop();
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(link.href); // clean up
-          })
-          .catch((error) => {
-            console.error("Download failed:", error);
-            alert(
-              "Sorry, could not download the file.\nPlease try right-click → Save link as..."
-            );
-            // Fallback: try opening in new tab
-            window.open(url, "_blank");
-          });
-      }
-    </script>
   </body>
 </html>
