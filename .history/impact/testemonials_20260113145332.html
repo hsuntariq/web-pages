@@ -62,7 +62,7 @@
       onSnapshot(doc(db, "siteContent", "main"), (snap) => {
         const data = snap.exists() ? snap.data() : {};
         const testimonials = data.testimonials || [];
-        document.getElementById("hrdcLogo2").src =
+        document.getElementById("hrdcLogo").src =
           data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
         const container = document.getElementById("testimonialsContainer");
         container.innerHTML = "";
@@ -173,7 +173,7 @@
             difference for yourself.
           </p>
           <a
-            href="./classes.html"
+            href="training-schedule.html"
             class="inline-block bg-white text-primary px-12 py-5 rounded-xl text-xl font-bold hover:bg-gray-100 transition shadow-lg"
           >
             VIEW CLASS SCHEDULE →

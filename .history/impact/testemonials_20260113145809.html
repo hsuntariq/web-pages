@@ -62,7 +62,7 @@
       onSnapshot(doc(db, "siteContent", "main"), (snap) => {
         const data = snap.exists() ? snap.data() : {};
         const testimonials = data.testimonials || [];
-        document.getElementById("hrdcLogo2").src =
+        document.getElementById("hrdcLogo").src =
           data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
         const container = document.getElementById("testimonialsContainer");
         container.innerHTML = "";
