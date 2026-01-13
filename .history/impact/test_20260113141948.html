@@ -37,9 +37,6 @@
       body {
         font-family: "Inter", sans-serif;
       }
-      html {
-        scroll-behavior: smooth;
-      }
     </style>
 
     <!-- Firebase SDK -->
@@ -127,11 +124,11 @@
         doubleImpact: {
           title: "THE DOUBLE IMPACT ADVANTAGE",
           subtitle:
-            "We don't just teach; we ensure transformation. Our unique methodology guarantees results for both the individual and the organization.",
+            "We don’t just teach; we ensure transformation. Our unique methodology guarantees results for both the individual and the organization.",
           feature1: {
             icon: "bi-perplexity",
             title: "AI STUDY COMPANION",
-            desc: "Learning doesn't stop when the class ends. Our Custom AI tutor helps students study after sessions, reinforcing concepts and answering questions 24/7.",
+            desc: "Learning doesn’t stop when the class ends. Our Custom AI tutor helps students study after sessions, reinforcing concepts and answering questions 24/7.",
           },
           feature2: {
             icon: "bi-people",
@@ -146,11 +143,11 @@
           testimonialTitle: "100% Success",
           testimonialSubtitle: "PMP Certificate Holder Rate",
           quote1:
-            "I was worried about the PMP exam, but the AI tutor made it a breeze! It was actually... fun?",
-          author1: "John S.",
+            "“I was worried about the PMP exam, but the AI tutor made it a breeze! It was actually... fun?”",
+          author1: "— John S.",
           quote2:
-            "The only thing agile about me before this was how fast I ran away from spreadsheets. Now I'm a pro!",
-          author2: "Amanda L.",
+            "“The only thing agile about me before this was how fast I ran away from spreadsheets. Now I'm a pro!”",
+          author2: "— Amanda L.",
         },
         cta: {
           title: "READY TO MAKE AN IMPACT?",
@@ -171,37 +168,6 @@
           ],
           company: ["About Us", "Contact", "Careers", "Privacy Policy"],
         },
-        buttonLinks: {
-          heroButton1Link: "#services",
-          heroButton2Link: "#contact",
-          consultancyButtonLink: "#services",
-          trainingButtonLink: "#training",
-          digitalButtonLink: "#services",
-          brochureButtonLink: "#",
-          successStoriesLink: "#",
-          ctaButton1Link: "#contact",
-          ctaButton2Link: "#",
-          navGetStartedLink: "#contact",
-          navServicesLink: "#services",
-          navTrainingLink: "#training",
-          navAboutLink: "#about",
-          navContactLink: "#contact",
-        },
-        upcomingClasses: [],
-        testimonials: [],
-        social: {
-          linkedin: "",
-          twitter: "",
-          facebook: "",
-          instagram: "",
-        },
-      };
-
-      const updateButtonLink = (id, link) => {
-        const element = document.getElementById(id);
-        if (element && link) {
-          element.href = link;
-        }
       };
 
       onSnapshot(doc(db, "siteContent", "main"), (snap) => {
@@ -209,8 +175,6 @@
 
         // Hero
         document.getElementById("hrdcLogo").src =
-          data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
-        document.getElementById("hrdcLogo2").src =
           data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
         document.getElementById("heroTitle1").textContent =
           data.hero?.title1 || "";
@@ -221,8 +185,6 @@
         document.getElementById("heroDesc").textContent =
           data.hero?.description || "";
         document.getElementById("heroImage").src = data.hero?.image || "";
-
-        // Navbar Logo
 
         // Core Capabilities
         document.getElementById("coreTitle").textContent =
@@ -332,198 +294,24 @@
         )
           .map((c) => `<li>${c}</li>`)
           .join("");
-
-        // Social Links
-        const linkedinLink = data.social?.linkedin;
-        const twitterLink = data.social?.twitter;
-        const facebookLink = data.social?.facebook;
-        const instagramLink = data.social?.instagram;
-
-        if (linkedinLink) {
-          const linkedinEl = document.getElementById("footerLinkedin");
-          if (linkedinEl) linkedinEl.href = linkedinLink;
-        }
-
-        if (twitterLink) {
-          const twitterEl = document.getElementById("footerTwitter");
-          if (twitterEl) twitterEl.href = twitterLink;
-        }
-
-        if (facebookLink) {
-          const facebookEl = document.getElementById("footerFacebook");
-          if (facebookEl) facebookEl.href = facebookLink;
-        }
-
-        if (instagramLink) {
-          const instagramEl = document.getElementById("footerInstagram");
-          if (instagramEl) instagramEl.href = instagramLink;
-        }
-
-        // Update all button links
-        const buttonLinks = data.buttonLinks || defaultData.buttonLinks;
-
-        updateButtonLink("navGetStartedBtn", buttonLinks.navGetStartedLink);
-        updateButtonLink("navServicesLink", buttonLinks.navServicesLink);
-        updateButtonLink("navTrainingLink", buttonLinks.navTrainingLink);
-        updateButtonLink("navAboutLink", buttonLinks.navAboutLink);
-        updateButtonLink("navContactLink", buttonLinks.navContactLink);
-
-        updateButtonLink("heroServicesBtn", buttonLinks.heroButton1Link);
-        updateButtonLink("heroContactBtn", buttonLinks.heroButton2Link);
-        updateButtonLink(
-          "consultancyLearnMore",
-          buttonLinks.consultancyButtonLink
-        );
-        updateButtonLink("trainingCatalogBtn", buttonLinks.trainingButtonLink);
-        updateButtonLink("digitalLearnMore", buttonLinks.digitalButtonLink);
-        updateButtonLink("brochureBtn", buttonLinks.brochureButtonLink);
-        updateButtonLink("successStoriesBtn", buttonLinks.successStoriesLink);
-        updateButtonLink("ctaButton1", buttonLinks.ctaButton1Link);
-        updateButtonLink("ctaButton2", buttonLinks.ctaButton2Link);
-
-        // Render upcoming classes
-        renderUpcomingClasses(data.upcomingClasses || []);
-
-        // Render testimonials
-        renderTestimonials(data.testimonials || []);
       });
-
-      function renderUpcomingClasses(classes) {
-        const container = document.getElementById("upcomingClassesContainer");
-        if (!container) return;
-
-        container.innerHTML = "";
-
-        if (classes.length === 0) {
-          container.innerHTML = `
-                    <div class="text-center py-12">
-                        <p class="text-gray-500">No upcoming classes scheduled yet.</p>
-                        <p class="text-sm text-gray-400 mt-2">Check back soon for updates!</p>
-                    </div>
-                `;
-          return;
-        }
-
-        classes.forEach((cls, index) => {
-          const classElement = document.createElement("div");
-          classElement.className =
-            "bg-gray-900 rounded-2xl p-8 mb-6 border border-gray-800";
-          classElement.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <div class="text-primary font-bold text-lg">${
-                              cls.date || "Date TBD"
-                            }</div>
-                            <h3 class="text-2xl font-bold text-white mt-2">${
-                              cls.title || "Class Title"
-                            }</h3>
-                            <div class="text-gray-300 mt-2">${
-                              cls.time || "Time TBD"
-                            }</div>
-                            ${
-                              cls.instructor
-                                ? `<div class="text-gray-400 mt-1">Instructor: ${cls.instructor}</div>`
-                                : ""
-                            }
-                            ${
-                              cls.location
-                                ? `<div class="text-gray-400 mt-1">Location: ${cls.location}</div>`
-                                : ""
-                            }
-                        </div>
-                        <div class="flex flex-col gap-3 mt-4 md:mt-0">
-                            ${
-                              cls.link
-                                ? `<a href="${cls.link}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition text-center">Register Now</a>`
-                                : ""
-                            }
-                            ${
-                              cls.pdf
-                                ? `<a href="${cls.pdf}" target="_blank" class="border border-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition text-center">Download Brochure (PDF)</a>`
-                                : ""
-                            }
-                        </div>
-                    </div>
-                `;
-          container.appendChild(classElement);
-        });
-      }
-
-      function renderTestimonials(testimonials) {
-        const container = document.getElementById("testimonialsContainer");
-        if (!container || !testimonials.length) return;
-
-        container.innerHTML = "";
-
-        testimonials.forEach((testimonial, index) => {
-          const testimonialElement = document.createElement("div");
-          testimonialElement.className = "bg-gray-800 rounded-xl p-8";
-          testimonialElement.innerHTML = `
-                    <div class="flex items-center mb-4">
-                        ${Array(5)
-                          .fill()
-                          .map(
-                            (_, i) =>
-                              `<i class="${
-                                i < (testimonial.rating || 5)
-                                  ? "text-yellow-400"
-                                  : "text-gray-600"
-                              } bi bi-star-fill"></i>`
-                          )
-                          .join("")}
-                    </div>
-                    <p class="text-lg italic text-gray-200 mb-6">"${
-                      testimonial.quote
-                    }"</p>
-                    <div class="font-bold text-white">${
-                      testimonial.author
-                    }</div>
-                `;
-          container.appendChild(testimonialElement);
-        });
-      }
     </script>
   </head>
   <body class="bg-white text-gray-900">
-    <!-- Navigation -->
+    <!-- Navigation (static) -->
     <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
       <nav
         class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
-        <img
-          width="50px"
-          id="hrdcLogo"
-          class="text-2xl font-bold text-accent"
-        />
+        <div class="text-2xl font-bold text-accent">IMPACT</div>
         <div class="hidden md:flex space-x-8 text-sm font-medium">
-          <a
-            id="navServicesLink"
-            href="#services"
-            class="hover:text-primary transition"
-            >SERVICES</a
-          >
-          <a
-            id="navTrainingLink"
-            href="#training"
-            class="hover:text-primary transition"
-            >TRAINING</a
-          >
-          <a
-            id="navAboutLink"
-            href="#about"
-            class="hover:text-primary transition"
-            >ABOUT</a
-          >
-          <a
-            id="navContactLink"
-            href="#contact"
-            class="hover:text-primary transition"
-            >CONTACT</a
-          >
+          <a href="#services" class="hover:text-primary transition">SERVICES</a>
+          <a href="#training" class="hover:text-primary transition">TRAINING</a>
+          <a href="#about" class="hover:text-primary transition">ABOUT</a>
+          <a href="#contact" class="hover:text-primary transition">CONTACT</a>
         </div>
         <a
-          id="navGetStartedBtn"
-          href="#contact"
+          href="#"
           class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition"
           >GET STARTED</a
         >
@@ -536,12 +324,7 @@
         class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center"
       >
         <div>
-          <img
-            width="40px"
-            id="hrdcLogo2"
-            class="text-2xl font-bold text-accent"
-            alt="HRDC"
-          />
+          <img id="hrdcLogo" src="" alt="HRDC" class="h-12 mb-6" />
           <h1 class="text-5xl md:text-6xl font-bold leading-tight">
             <span id="heroTitle1"></span><br />
             <span
@@ -557,14 +340,12 @@
           ></p>
           <div class="flex flex-col sm:flex-row gap-4">
             <a
-              id="heroServicesBtn"
-              href="#services"
+              href="#"
               class="bg-primary text-white px-8 py-4 rounded-md font-medium hover:bg-primary/90 transition"
               >OUR SERVICES</a
             >
             <a
-              id="heroContactBtn"
-              href="#contact"
+              href="#"
               class="border border-gray-900 text-gray-900 px-8 py-4 rounded-md font-medium hover:bg-gray-900 hover:text-white transition"
               >CONTACT US</a
             >
@@ -581,26 +362,11 @@
       </div>
     </section>
 
-    <!-- Services Section -->
-    <!-- <section id="services" class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-4xl font-bold mb-12 text-center">Our Services</h2>
-        <p class="text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-          We offer comprehensive solutions to help your organization achieve
-          excellence in project management, AI implementation, and digital
-          transformation.
-        </p>
-      </div>
-    </section> -->
-
     <!-- Core Capabilities -->
-    <section id="services" class="py-20 bg-white">
+    <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-6">
-        <h2 id="coreTitle" class="text-4xl font-bold mb-12 text-center"></h2>
-        <p
-          id="coreSubtitle"
-          class="text-gray-600 mb-16 w-full md:w-1/2 mx-auto text-center"
-        ></p>
+        <h2 id="coreTitle" class="text-4xl font-bold mb-12"></h2>
+        <p id="coreSubtitle" class="text-gray-600 mb-16 w-full md:w-1/2"></p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="bg-gray-50 rounded-2xl p-8 shadow-lg">
             <div
@@ -611,8 +377,7 @@
             <h3 id="consultancyTitle" class="text-2xl font-bold mb-4"></h3>
             <ul id="consultancyList" class="space-y-3 text-gray-600"></ul>
             <a
-              id="consultancyLearnMore"
-              href="#services"
+              href="#"
               class="mt-8 inline-block text-primary font-medium hover:underline"
               >LEARN MORE →</a
             >
@@ -629,8 +394,7 @@
             <p id="trainingDesc" class="text-gray-600 mb-6"></p>
             <div id="trainingTags" class="flex flex-wrap gap-2 mb-6"></div>
             <a
-              id="trainingCatalogBtn"
-              href="#training"
+              href="#"
               class="mt-8 inline-block text-green-400 font-medium hover:underline"
               >VIEW COURSE CATALOG →</a
             >
@@ -644,8 +408,7 @@
             <h3 id="digitalTitle" class="text-2xl font-bold mb-4"></h3>
             <ul id="digitalList" class="space-y-3 text-gray-600"></ul>
             <a
-              id="digitalLearnMore"
-              href="#services"
+              href="#"
               class="mt-8 inline-block text-primary font-medium hover:underline"
               >LEARN MORE →</a
             >
@@ -654,33 +417,19 @@
       </div>
     </section>
 
-    <!-- Training Section -->
-    <!-- <section id="training" class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-4xl font-bold mb-12 text-center">Training Programs</h2>
-        <p class="text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-          Elevate your professional capabilities with our HRDC-certified
-          training programs.
-        </p>
-      </div>
-    </section> -->
-
     <!-- Certified Training Programs -->
-    <section id="training" class="py-20 bg-gray-50">
+    <section class="py-20 bg-gray-50">
       <div
         class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center"
       >
         <div>
           <h2 id="programsTitle" class="text-4xl font-bold mb-6"></h2>
           <p id="programsDesc" class="text-gray-600 mb-8"></p>
-          <a
-            href="./2Impact PMP.pdf"
-            download
-            id="brochureBtn"
+          <button
             class="bg-gray-900 text-white px-8 py-4 mt-10 rounded-md font-medium hover:bg-gray-800 transition"
           >
             DOWNLOAD COURSE BROCHURE
-          </a>
+          </button>
         </div>
         <div
           class="bg-gradient-to-br from-teal-50 to-blue-50 rounded-3xl p-12 shadow-xl"
@@ -701,28 +450,11 @@
           ></span>
         </h2>
         <p id="upcomingDesc" class="text-lg mb-10"></p>
-        <!-- Dynamic Upcoming Classes Container -->
-        <div
-          id="upcomingClassesContainer"
-          class="max-w-4xl mx-auto mb-12"
-        ></div>
         <a
           href="./classes.html"
           id="upcomingButton"
           class="bg-primary text-white px-10 py-5 rounded-md text-lg font-medium hover:bg-primary/90 transition inline-block"
         ></a>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-4xl font-bold mb-12 text-center">About Us</h2>
-        <p class="text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-          We are committed to delivering excellence through innovative training
-          and consultancy solutions.
-        </p>
-        <!-- Double Impact Advantage will be displayed here -->
       </div>
     </section>
 
@@ -784,31 +516,14 @@
                 class="text-lg italic mt-8 mb-8"
               ></blockquote>
               <p id="author2" class="font-medium"></p>
-
-              <!-- Dynamic Testimonials Container -->
-              <div id="testimonialsContainer" class="mt-8 space-y-6"></div>
-
               <a
-                id="successStoriesBtn"
-                href="./testemonials.html"
+                href="#"
                 class="mt-10 inline-block text-primary font-medium hover:underline"
                 >SEE MORE SUCCESS STORIES →</a
               >
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="text-4xl font-bold mb-12 text-center">Contact Us</h2>
-        <p class="text-gray-600 text-center mb-16 max-w-3xl mx-auto">
-          Get in touch with us to learn more about our services and training
-          programs.
-        </p>
-        <!-- CTA will be displayed here -->
       </div>
     </section>
 
@@ -830,7 +545,7 @@
         ></p>
         <div class="flex flex-col sm:flex-row gap-6 justify-center">
           <a
-            href="#contact"
+            href="#"
             id="ctaButton1"
             class="bg-primary text-white px-12 py-5 rounded-md text-lg font-medium hover:bg-primary/90 transition shadow-lg"
           ></a>
@@ -871,29 +586,11 @@
           </div>
           <div class="flex flex-col justify-between">
             <div class="flex space-x-4 mb-8">
-              <a
-                id="footerLinkedin"
-                href="#"
-                class="text-gray-400 hover:text-white transition"
+              <a href="#" class="text-gray-400 hover:text-white transition"
                 ><i class="bi bi-linkedin text-2xl"></i
               ></a>
-              <a
-                id="footerTwitter"
-                href="#"
-                class="text-gray-400 hover:text-white transition"
+              <a href="#" class="text-gray-400 hover:text-white transition"
                 ><i class="bi bi-twitter-x text-2xl"></i
-              ></a>
-              <a
-                id="footerFacebook"
-                href="#"
-                class="text-gray-400 hover:text-white transition"
-                ><i class="bi bi-facebook text-2xl"></i
-              ></a>
-              <a
-                id="footerInstagram"
-                href="#"
-                class="text-gray-400 hover:text-white transition"
-                ><i class="bi bi-instagram text-2xl"></i
               ></a>
             </div>
             <div class="text-sm text-gray-500">

@@ -210,8 +210,6 @@
         // Hero
         document.getElementById("hrdcLogo").src =
           data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
-        document.getElementById("hrdcLogo2").src =
-          data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
         document.getElementById("heroTitle1").textContent =
           data.hero?.title1 || "";
         document.getElementById("heroHighlight").textContent =
@@ -223,6 +221,8 @@
         document.getElementById("heroImage").src = data.hero?.image || "";
 
         // Navbar Logo
+        document.getElementById("navLogo").textContent =
+          data.hero?.hrdcLogo || defaultData.hero.hrdcLogo;
 
         // Core Capabilities
         document.getElementById("coreTitle").textContent =
@@ -537,10 +537,9 @@
       >
         <div>
           <img
-            width="40px"
-            id="hrdcLogo2"
+            width="50px"
+            id="hrdcLogo"
             class="text-2xl font-bold text-accent"
-            alt="HRDC"
           />
           <h1 class="text-5xl md:text-6xl font-bold leading-tight">
             <span id="heroTitle1"></span><br />
@@ -673,14 +672,12 @@
         <div>
           <h2 id="programsTitle" class="text-4xl font-bold mb-6"></h2>
           <p id="programsDesc" class="text-gray-600 mb-8"></p>
-          <a
-            href="./2Impact PMP.pdf"
-            download
+          <button
             id="brochureBtn"
             class="bg-gray-900 text-white px-8 py-4 mt-10 rounded-md font-medium hover:bg-gray-800 transition"
           >
             DOWNLOAD COURSE BROCHURE
-          </a>
+          </button>
         </div>
         <div
           class="bg-gradient-to-br from-teal-50 to-blue-50 rounded-3xl p-12 shadow-xl"
