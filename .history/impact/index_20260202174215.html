@@ -216,19 +216,6 @@
       .my-sub:hover .my-sub-hover {
         display: block !important;
       }
-
-      .carousel-container {
-        overflow: hidden;
-        position: relative;
-      }
-      .carousel-track {
-        display: flex;
-        will-change: transform;
-        transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
-      }
-      .carousel-item {
-        flex: 0 0 auto;
-      }
     </style>
 
     <!-- Firebase SDK -->
@@ -550,56 +537,61 @@
         if (!track) return;
 
         onSnapshot(doc(db, "siteContent", "main"), (snap) => {
-          console.log("Firebase data loaded:", snap.data()); // debug
+          console.log("Firebase snapshot:", snap.data()); // ← for debugging
 
           const data = snap.exists() ? snap.data() : {};
           let items = data.carouselItems || [];
 
-          // Fallback if Firebase is empty (you can remove later)
+          // Fallback items (you can remove this once Firebase has real data)
           if (items.length === 0) {
             items = [
               {
-                image: "", // ← Cloudinary URL will go here
+                image: "", // ← will be replaced with uploaded Cloudinary URL
                 icon: "🌐", // fallback if no image
+                title: "AWS-DEV",
+                subtitle: "Developing on AWS",
+                price: "RM5,400.00 – RM6,075.00",
+                gradient: "linear-gradient(135deg, #0ea5e9, #60a5fa, #93c5fd)",
+              },
+              {
+                image: "",
+                icon: "🔧",
                 title: "RH124",
                 subtitle: "Red Hat System Administration I",
                 price: "RM5,475.00",
-                gradient: "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)",
+                gradient: "linear-gradient(135deg, #0ea5e9, #60a5fa, #93c5fd)",
               },
-
-              // add more fallback items if you want
+              // ... more fallback items if needed
             ];
           }
 
-          // Duplicate items for infinite loop (seamless scrolling)
+          // Duplicate for infinite loop
+          const allItems = [...items, ...items];
 
-          track.innerHTML = items
+          track.innerHTML = allItems
             .map((item) => {
-              console.log(item);
-              // Use uploaded image if available, otherwise fallback to emoji icon
-              const topVisual = item.image
-                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[130px] max-h-[130px] object-contain">`
-                : `<div class="text-5xl">${item.icon || "❓"}</div>`;
+              // Use uploaded image if available, otherwise fallback to icon
+              const topContent = item.image
+                ? `<img src="${item.image}" alt="${item.title}" class="w-20 h-20 object-contain mx-auto">`
+                : `<div class="w-20 h-20 bg-white border border-gray-300 rounded-lg flex items-center justify-center text-4xl mx-auto">
+               ${item.icon || "?"}
+             </div>`;
 
               return `
-        <div class="carousel-item p-0  flex-shrink-0 w-[380px] mx-4 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl  bg-white border border-gray-200">
-          <div class="h-full flex flex-col bg-white border border-gray-200">
-            <!-- Top icon/image area - white rectangle -->
-            <div style="height:200px; background: ${item.gradient || "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)"}" class="p-6 flex items-center justify-center border-b  border-gray-200 ">
-              ${topVisual}
+        <div class="carousel-item flex-shrink-0 w-[280px] mx-4 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl" style="background: ${item.gradient || "linear-gradient(135deg, #0ea5e9, #60a5fa, #93c5fd)"};">
+          <div class="relative h-full flex flex-col">
+            <!-- Top image/icon area -->
+            <div class="pt-6 pb-4 px-6 flex justify-center bg-white/90">
+              ${topContent}
             </div>
 
-            <!-- Main content area -->
-            <div class=" bg-tranparent flex-grow">
-              <h3 class="text-sm font-bold text-orange-600 mb-1">
-                ${item.title}:
-              </h3>
-              <p class="text-sm text-gray-800 leading-tight">
-                ${item.subtitle}
-              </p>
+            <!-- Main content -->
+            <div class="px-6 pb-6 flex-grow flex flex-col">
+              <h3 class="text-xl font-bold text-orange-600 mb-1">${item.title}</h3>
+              <p class="text-base text-gray-800 mb-6">${item.subtitle}</p>
             </div>
 
-            <!-- Bottom white price bar -->
+            <!-- Fixed price bar at bottom -->
             <div class="bg-white px-6 py-4 border-t border-gray-200 mt-auto">
               <div class="text-sm font-medium text-gray-700">${item.title}</div>
               <div class="text-lg font-bold text-gray-900">${item.price}</div>
@@ -611,43 +603,39 @@
             .join("");
 
           // ────────────────────────────────────────────────
-          // Infinite smooth scroll (pixel-by-pixel, seamless reset)
+          // Infinite smooth scroll logic (unchanged)
           // ────────────────────────────────────────────────
           let position = 0;
-          const itemWidth = 280 + 32; // width + mx-4 margin
+          const itemWidth = 280 + 32; // card width + mx-4 margin
           const originalLength = items.length * itemWidth;
 
           function autoScroll() {
-            position += 1.2; // ← speed (smaller = slower, e.g. 0.4)
+            position += 0.8;
             track.style.transform = `translateX(-${position}px)`;
 
-            // Reset position when reaching end of first copy (no jump)
             if (position >= originalLength) {
               position = 0;
               track.style.transition = "none";
               track.style.transform = `translateX(0px)`;
-              void track.offsetWidth; // force reflow
+              void track.offsetWidth;
               track.style.transition =
                 "transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)";
             }
           }
 
-          let scrollInterval = setInterval(autoScroll, 10);
+          let scrollInterval = setInterval(autoScroll, 20);
 
-          // Pause on hover
           const container = document.querySelector(".carousel-container");
-          if (container) {
-            container.addEventListener("mouseenter", () =>
-              clearInterval(scrollInterval),
-            );
-            container.addEventListener("mouseleave", () => {
-              scrollInterval = setInterval(autoScroll, 20);
-            });
-          }
+          container.addEventListener("mouseenter", () =>
+            clearInterval(scrollInterval),
+          );
+          container.addEventListener("mouseleave", () => {
+            scrollInterval = setInterval(autoScroll, 20);
+          });
         });
       }
 
-      // Make sure to call this after DOM is ready
+      // Run when page is ready
       document.addEventListener("DOMContentLoaded", initCarousel);
     </script>
   </head>
@@ -659,9 +647,9 @@
         class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
         <img
-          width="100px"
+          width="50px"
           id="hrdcLogo"
-          class="text-2xl font-bold text-accent -mb-3"
+          class="text-2xl font-bold text-accent"
           alt="Impact Logo"
         />
 
@@ -1095,7 +1083,7 @@
     </section>
 
     <!-- Featured Training Programs - Exact match to screenshot -->
-    <section class="py-16">
+    <section class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-6">
         <h2
           class="text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900"
@@ -1103,7 +1091,7 @@
           Featured Training Programs
         </h2>
 
-        <div class="carousel-container overflow-x-hidden relative">
+        <div class="carousel-container overflow-hidden relative">
           <div
             class="carousel-track flex transition-transform duration-1000 ease-in-out"
             id="carouselTrack"

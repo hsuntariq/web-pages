@@ -578,7 +578,7 @@
               console.log(item);
               // Use uploaded image if available, otherwise fallback to emoji icon
               const topVisual = item.image
-                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[130px] max-h-[130px] object-contain">`
+                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[130px] max-h-[80px] object-contain">`
                 : `<div class="text-5xl">${item.icon || "❓"}</div>`;
 
               return `
@@ -618,7 +618,7 @@
           const originalLength = items.length * itemWidth;
 
           function autoScroll() {
-            position += 1.2; // ← speed (smaller = slower, e.g. 0.4)
+            position += 0.8; // ← speed (smaller = slower, e.g. 0.4)
             track.style.transform = `translateX(-${position}px)`;
 
             // Reset position when reaching end of first copy (no jump)
@@ -632,7 +632,7 @@
             }
           }
 
-          let scrollInterval = setInterval(autoScroll, 10);
+          let scrollInterval = setInterval(autoScroll, 20);
 
           // Pause on hover
           const container = document.querySelector(".carousel-container");
@@ -659,9 +659,9 @@
         class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
         <img
-          width="100px"
+          width="50px"
           id="hrdcLogo"
-          class="text-2xl font-bold text-accent -mb-3"
+          class="text-2xl font-bold text-accent"
           alt="Impact Logo"
         />
 

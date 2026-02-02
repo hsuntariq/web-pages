@@ -626,7 +626,7 @@
           const seen = new Set();
           const uniqueClasses = [];
           classes.forEach((c) => {
-            const key = `${(c.title || "").toLowerCase().trim()}|${(c.date || "").toLowerCase().trim()}`;
+            const key = `${(c.title||"").toLowerCase().trim()}|${(c.date||"").toLowerCase().trim()}`;
             if (!seen.has(key)) {
               seen.add(key);
               uniqueClasses.push(c);
@@ -667,7 +667,7 @@
           const seenCards = new Set();
           const uniqueCards = [];
           cards.forEach((c) => {
-            const key = `${(c.image || "").trim()}|${(c.title || "").toLowerCase().trim()}|${(c.subtitle || "").toLowerCase().trim()}`;
+            const key = `${(c.image||"").trim()}|${(c.title||"").toLowerCase().trim()}|${(c.subtitle||"").toLowerCase().trim()}`;
             if (!seenCards.has(key)) {
               seenCards.add(key);
               uniqueCards.push(c);

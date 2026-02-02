@@ -88,6 +88,24 @@
         font-weight: 600;
         color: #c7d2fe;
       }
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 50;
+      }
+
+      nav {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
 
       /* ================= NAV LINKS ================= */
       .nav-links {
@@ -213,21 +231,23 @@
         color: #00c4b4;
       }
 
-      .my-sub:hover .my-sub-hover {
-        display: block !important;
+      /* ================= CTA ================= */
+      .cta {
+        background: #00c4b4;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
       }
 
-      .carousel-container {
-        overflow: hidden;
-        position: relative;
+      .cta:hover {
+        background: #00b3a5;
       }
-      .carousel-track {
-        display: flex;
-        will-change: transform;
-        transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
-      }
-      .carousel-item {
-        flex: 0 0 auto;
+
+      /* spacer for fixed header */
+      .spacer {
+        height: 90px;
       }
     </style>
 
@@ -544,504 +564,160 @@
           container.appendChild(el);
         });
       }
-
-      function initCarousel() {
-        const track = document.getElementById("carouselTrack");
-        if (!track) return;
-
-        onSnapshot(doc(db, "siteContent", "main"), (snap) => {
-          console.log("Firebase data loaded:", snap.data()); // debug
-
-          const data = snap.exists() ? snap.data() : {};
-          let items = data.carouselItems || [];
-
-          // Fallback if Firebase is empty (you can remove later)
-          if (items.length === 0) {
-            items = [
-              {
-                image: "", // ← Cloudinary URL will go here
-                icon: "🌐", // fallback if no image
-                title: "RH124",
-                subtitle: "Red Hat System Administration I",
-                price: "RM5,475.00",
-                gradient: "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)",
-              },
-
-              // add more fallback items if you want
-            ];
-          }
-
-          // Duplicate items for infinite loop (seamless scrolling)
-
-          track.innerHTML = items
-            .map((item) => {
-              console.log(item);
-              // Use uploaded image if available, otherwise fallback to emoji icon
-              const topVisual = item.image
-                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[130px] max-h-[130px] object-contain">`
-                : `<div class="text-5xl">${item.icon || "❓"}</div>`;
-
-              return `
-        <div class="carousel-item p-0  flex-shrink-0 w-[380px] mx-4 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl  bg-white border border-gray-200">
-          <div class="h-full flex flex-col bg-white border border-gray-200">
-            <!-- Top icon/image area - white rectangle -->
-            <div style="height:200px; background: ${item.gradient || "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)"}" class="p-6 flex items-center justify-center border-b  border-gray-200 ">
-              ${topVisual}
-            </div>
-
-            <!-- Main content area -->
-            <div class=" bg-tranparent flex-grow">
-              <h3 class="text-sm font-bold text-orange-600 mb-1">
-                ${item.title}:
-              </h3>
-              <p class="text-sm text-gray-800 leading-tight">
-                ${item.subtitle}
-              </p>
-            </div>
-
-            <!-- Bottom white price bar -->
-            <div class="bg-white px-6 py-4 border-t border-gray-200 mt-auto">
-              <div class="text-sm font-medium text-gray-700">${item.title}</div>
-              <div class="text-lg font-bold text-gray-900">${item.price}</div>
-            </div>
-          </div>
-        </div>
-      `;
-            })
-            .join("");
-
-          // ────────────────────────────────────────────────
-          // Infinite smooth scroll (pixel-by-pixel, seamless reset)
-          // ────────────────────────────────────────────────
-          let position = 0;
-          const itemWidth = 280 + 32; // width + mx-4 margin
-          const originalLength = items.length * itemWidth;
-
-          function autoScroll() {
-            position += 1.2; // ← speed (smaller = slower, e.g. 0.4)
-            track.style.transform = `translateX(-${position}px)`;
-
-            // Reset position when reaching end of first copy (no jump)
-            if (position >= originalLength) {
-              position = 0;
-              track.style.transition = "none";
-              track.style.transform = `translateX(0px)`;
-              void track.offsetWidth; // force reflow
-              track.style.transition =
-                "transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)";
-            }
-          }
-
-          let scrollInterval = setInterval(autoScroll, 10);
-
-          // Pause on hover
-          const container = document.querySelector(".carousel-container");
-          if (container) {
-            container.addEventListener("mouseenter", () =>
-              clearInterval(scrollInterval),
-            );
-            container.addEventListener("mouseleave", () => {
-              scrollInterval = setInterval(autoScroll, 20);
-            });
-          }
-        });
-      }
-
-      // Make sure to call this after DOM is ready
-      document.addEventListener("DOMContentLoaded", initCarousel);
     </script>
   </head>
 
   <body class="bg-white text-gray-900">
     <!-- Navigation / Header -->
-    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-      <nav
-        class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
-      >
-        <img
-          width="100px"
-          id="hrdcLogo"
-          class="text-2xl font-bold text-accent -mb-3"
-          alt="Impact Logo"
-        />
+    <header>
+      <nav>
+        <img width="50" alt="Impact Logo" />
 
-        <div
-          class="relative bg-orange-400 p-3 rounded-lg text-white text-sm font-semibold group"
-        >
-          <button
-            class="hover:text-primary transition flex items-center gap-1 font-medium"
-          >
-            <i class="bi bi-list"></i> ALL COURSES
-            <i
-              class="bi bi-chevron-down text-xs transition-transform group-hover:rotate-180"
-            ></i>
-          </button>
+        <div class="nav-links">
+          <a href="#services">SERVICES</a>
+          <a href="#training">TRAINING</a>
 
-          <div
-            class="absolute left-0 top-full z-[9999] pt-1 w-72 bg-white rounded-lg group-hover:visible invisible shadow-2xl shadow-gray-500 border border-gray-200 overflow-visible text-sm"
-          >
-            <div
-              class="bg-gray-900 text-white px-5 py-4 font-semibold text-base"
-            >
-              Search by Principals
-            </div>
+          <!-- ================= ALL COURSES ================= -->
+          <div class="courses">
+            <button>
+              ALL COURSES
+              <i class="bi bi-chevron-down"></i>
+            </button>
 
-            <div class="divide-y divide-gray-100">
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-200 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900">Agile & Scrum</span>
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Agile & Scrum Courses
+            <div class="courses-dropdown">
+              <div class="courses-header">Search by Principals</div>
+
+              <div class="courses-list">
+                <!-- ================= Agile & Scrum ================= -->
+                <div class="category">
+                  <div class="category-title">
+                    <span>Agile & Scrum</span>
+                    <i class="bi bi-chevron-right"></i>
+                  </div>
+
+                  <div class="subcategory">
+                    <div class="subcategory-inner">
+                      <div class="subcategory-title">Agile & Scrum Courses</div>
+                      <a class="course-link" href="#"
+                        >ICP-LEA: ICAgile Leading with Agility</a
+                      >
+                      <a class="course-link" href="#"
+                        >PAL-E: Professional Agile Leadership – Essentials</a
+                      >
+                      <a class="course-link" href="#"
+                        >PMI-ACP: PMI Agile Certified Practitioner</a
+                      >
+                      <a class="course-link" href="#"
+                        >PSM: Professional Scrum Master Certification</a
+                      >
+                      <a class="course-link" href="#"
+                        >PSPO: Professional Scrum Product Owner</a
+                      >
                     </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="icp-lea.pdf"
-                    >
-                      ICP-LEA: ICAgile Leading with Agility
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="pal-e.pdf"
-                    >
-                      PAL-E: Professional Agile Leadership – Essentials
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="pmi-acp.pdf"
-                    >
-                      PMI-ACP: PMI Agile Certified Practitioner
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="psm.pdf"
-                    >
-                      PSM: Professional Scrum Master Certification
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="pspo.pdf"
-                    >
-                      PSPO: Professional Scrum Product Owner
-                    </a>
                   </div>
                 </div>
-              </div>
 
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-200 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900">Cloud Computing</span>
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Cloud Computing Courses
+                <!-- ================= Cloud Computing ================= -->
+                <div class="category">
+                  <div class="category-title">
+                    <span>Cloud Computing</span>
+                    <i class="bi bi-chevron-right"></i>
+                  </div>
+
+                  <div class="subcategory">
+                    <div class="subcategory-inner">
+                      <div class="subcategory-title">
+                        Cloud Computing Courses
+                      </div>
+                      <a class="course-link" href="#"
+                        >Microsoft Azure Fundamentals (AZ-900)</a
+                      >
+                      <a class="course-link" href="#"
+                        >AWS Certified Cloud Practitioner</a
+                      >
                     </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="az-900.pdf"
-                    >
-                      Microsoft Azure Fundamentals (AZ-900)
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="aws-cloud-practitioner.pdf"
-                    >
-                      AWS Certified Cloud Practitioner
-                    </a>
                   </div>
                 </div>
-              </div>
 
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-200 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900"
-                    >AI & Machine Learning</span
-                  >
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      AI & Machine Learning Courses
+                <!-- ================= AI & ML ================= -->
+                <div class="category">
+                  <div class="category-title">
+                    <span>AI & Machine Learning</span>
+                    <i class="bi bi-chevron-right"></i>
+                  </div>
+
+                  <div class="subcategory">
+                    <div class="subcategory-inner">
+                      <div class="subcategory-title">
+                        AI & Machine Learning Courses
+                      </div>
+                      <a class="course-link" href="#">AI for Everyone</a>
+                      <a class="course-link" href="#"
+                        >ChatGPT & Generative AI</a
+                      >
+                      <a class="course-link" href="#"
+                        >Generative AI for Project Professionals</a
+                      >
+                      <a class="course-link" href="#"
+                        >Agentic AI for Business</a
+                      >
                     </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="ai-for-everyone.pdf"
-                    >
-                      AI for Everyone
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="chatgpt-genai.pdf"
-                    >
-                      ChatGPT & Generative AI
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="genai-pm.pdf"
-                    >
-                      Generative AI for Project Professionals
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-200 hover:text-primary rounded transition course-link"
-                      data-pdf="agentic-ai.pdf"
-                    >
-                      Agentic AI for Business
-                    </a>
                   </div>
                 </div>
-              </div>
 
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-200 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900"
-                    >Project Management</span
-                  >
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Project Management Courses
+                <!-- ================= Project Management ================= -->
+                <div class="category">
+                  <div class="category-title">
+                    <span>Project Management</span>
+                    <i class="bi bi-chevron-right"></i>
+                  </div>
+
+                  <div class="subcategory">
+                    <div class="subcategory-inner">
+                      <div class="subcategory-title">
+                        Project Management Courses
+                      </div>
+                      <a class="course-link" href="#"
+                        >PMP (Project Management Professional)</a
+                      >
+                      <a class="course-link" href="#">CAPM</a>
+                      <a class="course-link" href="#">PMI-ACP</a>
                     </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="pmp.pdf"
-                    >
-                      PMP (Project Management Professional)
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="capm.pdf"
-                    >
-                      CAPM (Certified Associate in Project Management)
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="pmi-acp.pdf"
-                    >
-                      PMI ACP
-                    </a>
                   </div>
                 </div>
-              </div>
 
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900"
-                    >Programming & Development</span
-                  >
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Programming & Development Courses
-                    </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="python-beginners.pdf"
-                    >
-                      Python Programming for Beginners
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="java-essentials.pdf"
-                    >
-                      Java Programming Essentials
-                    </a>
+                <!-- ================= Programming ================= -->
+                <div class="category">
+                  <div class="category-title">
+                    <span>Programming & Development</span>
+                    <i class="bi bi-chevron-right"></i>
                   </div>
-                </div>
-              </div>
 
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900">Soft Skills</span>
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Soft Skills Courses
+                  <div class="subcategory">
+                    <div class="subcategory-inner">
+                      <div class="subcategory-title">Programming Courses</div>
+                      <a class="course-link" href="#"
+                        >Python Programming for Beginners</a
+                      >
+                      <a class="course-link" href="#"
+                        >Java Programming Essentials</a
+                      >
                     </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="communication.pdf"
-                    >
-                      Effective Communication Skills
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="leadership.pdf"
-                    >
-                      Leadership & People Management
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="time-management.pdf"
-                    >
-                      Time Management & Productivity
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900"
-                    >Microsoft Productivity & Data Tools</span
-                  >
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      Microsoft Productivity Courses
-                    </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="power-bi.pdf"
-                    >
-                      Microsoft Power BI
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="excel-advanced.pdf"
-                    >
-                      Advanced Excel & PivotTables
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="relative my-sub">
-                <div
-                  class="px-5 py-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <span class="font-medium text-gray-900">JIRA & DevOps</span>
-                  <i class="bi bi-chevron-right text-gray-500 text-sm"></i>
-                </div>
-                <div
-                  class="absolute top-0 left-full w-[380px] bg-white border border-gray-200 shadow-2xl rounded-lg z-[10000] my-sub-hover hidden"
-                >
-                  <div class="p-5">
-                    <div class="font-semibold text-gray-800 mb-3 pb-2 border-b">
-                      JIRA & DevOps Courses
-                    </div>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="jira-fundamentals.pdf"
-                    >
-                      JIRA Fundamentals – Atlassian
-                    </a>
-                    <a
-                      href="#"
-                      class="block py-2.5 px-4 hover:bg-gray-50 hover:text-primary rounded transition course-link"
-                      data-pdf="jira-admin.pdf"
-                    >
-                      JIRA Administration – Intermediate
-                    </a>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <a href="#about">ABOUT</a>
+          <a href="#contact">CONTACT</a>
         </div>
 
-        <div class="hidden md:flex space-x-8 text-sm font-medium items-center">
-          <a
-            id="navServicesLink"
-            href="#services"
-            class="hover:text-primary transition"
-          >
-            SERVICES
-          </a>
-          <a
-            id="navTrainingLink"
-            href="#training"
-            class="hover:text-primary transition"
-          >
-            TRAINING
-          </a>
-
-          <a
-            id="navAboutLink"
-            href="#about"
-            class="hover:text-primary transition"
-            >ABOUT</a
-          >
-          <a
-            id="navContactLink"
-            href="#contact"
-            class="hover:text-primary transition"
-            >CONTACT</a
-          >
-        </div>
-
-        <a
-          id="navGetStartedBtn"
-          href="#contact"
-          class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition"
-        >
-          GET STARTED
-        </a>
+        <a class="cta" href="#contact">GET STARTED</a>
       </nav>
     </header>
+
+    <!-- <div class="spacer"></div> -->
 
     <!-- Hero -->
     <section class="pt-24 pb-16 bg-gray-50">
@@ -1090,26 +766,6 @@
             alt="Hero"
             class="rounded-2xl shadow-2xl w-full"
           />
-        </div>
-      </div>
-    </section>
-
-    <!-- Featured Training Programs - Exact match to screenshot -->
-    <section class="py-16">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2
-          class="text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900"
-        >
-          Featured Training Programs
-        </h2>
-
-        <div class="carousel-container overflow-x-hidden relative">
-          <div
-            class="carousel-track flex transition-transform duration-1000 ease-in-out"
-            id="carouselTrack"
-          >
-            <!-- Cards populated from Firebase -->
-          </div>
         </div>
       </div>
     </section>
@@ -1456,7 +1112,7 @@
       });
 
       // Infinite Carousel
-      const carousel = [
+      const carouselData = [
         {
           icon: "🌐",
           title: "AWS-DEV",
@@ -1525,6 +1181,54 @@
           price: "RM1,800.00 – RM2,250.00",
         },
       ];
+
+      function initCarousel() {
+        const track = document.getElementById("carouselTrack");
+        if (!track) return;
+
+        track.innerHTML = carouselData
+          .map(
+            (item) => `
+        <div class="carousel-item">
+          <div class="carousel-icon">${item.icon}</div>
+          <div class="carousel-title">${item.title}</div>
+          <div class="carousel-subtitle">${item.subtitle}</div>
+          <div class="carousel-price">${item.price}</div>
+        </div>
+      `,
+          )
+          .join("");
+
+        let position = 0;
+        const itemWidth = 300 + 32; // card width + margin
+        const totalOriginalWidth = (carouselData.length / 2) * itemWidth;
+
+        function scroll() {
+          position += 1;
+          track.style.transform = `translateX(-${position}px)`;
+
+          if (position >= totalOriginalWidth) {
+            position = 0;
+            track.style.transition = "none";
+            track.style.transform = `translateX(0px)`;
+            // Force reflow
+            track.offsetHeight;
+            track.style.transition =
+              "transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)";
+          }
+        }
+
+        let interval = setInterval(scroll, 30); // smooth continuous scroll
+
+        const container = document.querySelector(".carousel-container");
+        container.addEventListener("mouseenter", () => clearInterval(interval));
+        container.addEventListener("mouseleave", () => {
+          interval = setInterval(scroll, 30);
+        });
+      }
+
+      // Initialize carousel after DOM ready
+      document.addEventListener("DOMContentLoaded", initCarousel);
     </script>
   </body>
 </html>

@@ -100,17 +100,9 @@
               '<span class="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm">In-Person</span>';
           }
 
-          const phoneNumber = "60107662534"; // WhatsApp number without '+'
-          const messageLines = [
-            `Hello, I'm interested in the ${cls.title || ""} class.`,
-            `Date: ${cls.date || ""}`,
-            `Mode: ${cls.mode || ""}`,
-            `Status: ${cls.status || ""}`,
-            "Please let me know how to register.",
-          ];
-          const message = messageLines.join("\n");
-          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-          let actionButton = `<a href="${whatsappUrl}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition">REGISTER</a>`;
+          let actionButton = cls.link
+            ? `<a href="${cls.link}" target="_blank" class="bg-primary text-white px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition">REGISTER</a>`
+            : '<span class="text-gray-400 px-6 py-3">Register</span>';
 
           row.innerHTML = `
           <td class="py-6 px-4 font-medium text-gray-900">${

@@ -622,17 +622,7 @@
                 location,
               });
           });
-          // Remove exact-duplicate classes (same title+date) before saving
-          const seen = new Set();
-          const uniqueClasses = [];
-          classes.forEach((c) => {
-            const key = `${(c.title || "").toLowerCase().trim()}|${(c.date || "").toLowerCase().trim()}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              uniqueClasses.push(c);
-            }
-          });
-          data.upcomingClasses = uniqueClasses;
+          data.upcomingClasses = classes;
         }
 
         if (section === "testimonials") {
@@ -663,17 +653,7 @@
             if (title || subtitle)
               cards.push({ image, title, subtitle, price, gradient });
           });
-          // Deduplicate carousel cards by image+title+subtitle to avoid accidental duplicates
-          const seenCards = new Set();
-          const uniqueCards = [];
-          cards.forEach((c) => {
-            const key = `${(c.image || "").trim()}|${(c.title || "").toLowerCase().trim()}|${(c.subtitle || "").toLowerCase().trim()}`;
-            if (!seenCards.has(key)) {
-              seenCards.add(key);
-              uniqueCards.push(c);
-            }
-          });
-          data.carouselItems = uniqueCards;
+          data.carouselItems = cards;
         }
 
         try {

@@ -76,32 +76,26 @@
       }
       .carousel-preview {
         width: 280px;
-        height: 400px;
+        height: 340px;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
         display: flex;
         flex-direction: column;
+        padding: 1.5rem;
         color: white;
       }
-      .carousel-preview .image-container {
-        height: 140px;
-        background: rgba(0, 0, 0, 0.3);
+      .carousel-preview .icon-box {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-      .carousel-preview img {
-        max-height: 100%;
-        max-width: 100%;
-        object-fit: contain;
-        border-radius: 8px;
-      }
-      .carousel-preview .content {
-        padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
+        font-size: 2.5rem;
+        margin-bottom: 1.25rem;
+        backdrop-filter: blur(4px);
       }
       .carousel-preview .title {
         font-size: 1.375rem;
@@ -281,28 +275,8 @@
           navAboutLink: "#about",
           navContactLink: "#contact",
         },
-        carouselItems: [],
+        carouselItems: [], // NEW: default empty array
       };
-
-      // Random gradient generator
-      const randomGradients = [
-        "linear-gradient(135deg, #3b82f6, #1e40af)",
-        "linear-gradient(135deg, #06b6d4, #0e7490)",
-        "linear-gradient(135deg, #ec4899, #be185d)",
-        "linear-gradient(135deg, #6366f1, #4f46e5)",
-        "linear-gradient(135deg, #f59e0b, #d97706)",
-        "linear-gradient(135deg, #10b981, #047857)",
-        "linear-gradient(135deg, #ef4444, #b91c1c)",
-        "linear-gradient(135deg, #8b5cf6, #6d28d9)",
-        "linear-gradient(135deg, #22d3ee, #0e7490)",
-        "linear-gradient(135deg, #a78bfa, #7c3aed)",
-      ];
-
-      function getRandomGradient() {
-        return randomGradients[
-          Math.floor(Math.random() * randomGradients.length)
-        ];
-      }
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -335,7 +309,7 @@
           populateAllFields();
           renderUpcomingClasses();
           renderTestimonials();
-          renderCarouselCards();
+          renderCarouselCards(); // NEW: load carousel cards
         });
       }
 
@@ -345,6 +319,7 @@
           if (el) el.value = val || "";
         };
 
+        // Hero
         set("heroTitle1", currentData.hero?.title1);
         set("heroHighlight", currentData.hero?.highlight);
         set("heroTitle3", currentData.hero?.title3);
@@ -352,6 +327,7 @@
         set("heroImage", currentData.hero?.image);
         set("hrdcLogo", currentData.hero?.hrdcLogo);
 
+        // Core
         set("coreTitle", currentData.core?.title);
         set("coreSubtitle", currentData.core?.subtitle);
         set("consultancyTitle", currentData.core?.consultancy?.title);
@@ -371,15 +347,18 @@
           (currentData.core?.digital?.items || []).join("\n"),
         );
 
+        // Programs
         set("programsTitle", currentData.programs?.title);
         set("programsDesc", currentData.programs?.description);
         set("programsImage", currentData.programs?.image);
 
+        // Upcoming Text
         set("upcomingTitle", currentData.upcoming?.title);
         set("upcomingHighlight", currentData.upcoming?.highlight);
         set("upcomingDesc", currentData.upcoming?.description);
         set("upcomingButton", currentData.upcoming?.buttonText);
 
+        // Double Impact
         set("doubleTitle", currentData.doubleImpact?.title);
         set("doubleSubtitle", currentData.doubleImpact?.subtitle);
         set("feature1Title", currentData.doubleImpact?.feature1?.title);
@@ -398,21 +377,25 @@
         set("quote2", currentData.doubleImpact?.quote2);
         set("author2", currentData.doubleImpact?.author2);
 
+        // CTA
         set("ctaTitle", currentData.cta?.title);
         set("ctaHighlight", currentData.cta?.highlight);
         set("ctaDesc", currentData.cta?.description);
         set("ctaButton1", currentData.cta?.button1);
         set("ctaButton2", currentData.cta?.button2);
 
+        // Footer
         set("footerDesc", currentData.footer?.description);
         set("footerServices", (currentData.footer?.services || []).join("\n"));
         set("footerCompany", (currentData.footer?.company || []).join("\n"));
 
+        // Social
         set("socialLinkedIn", currentData.social?.linkedin || "");
         set("socialTwitter", currentData.social?.twitter || "");
         set("socialFacebook", currentData.social?.facebook || "");
         set("socialInstagram", currentData.social?.instagram || "");
 
+        // Button Links
         set(
           "heroButton1Link",
           currentData.buttonLinks?.heroButton1Link || "#services",
@@ -465,6 +448,7 @@
         );
       }
 
+      // Save section function (updated to handle carouselItems)
       window.saveSection = async (section) => {
         let data = {};
         const get = (id) => document.getElementById(id)?.value.trim() || "";
@@ -472,6 +456,12 @@
           document
             .getElementById(id)
             ?.value.split("\n")
+            .map((s) => s.trim())
+            .filter((s) => s) || [];
+        const comma = (id) =>
+          document
+            .getElementById(id)
+            ?.value.split(",")
             .map((s) => s.trim())
             .filter((s) => s) || [];
 
@@ -497,9 +487,7 @@
             training: {
               title: get("trainingTitle"),
               description: get("trainingDesc"),
-              tags: get("trainingTags")
-                .split(",")
-                .map((s) => s.trim()),
+              tags: comma("trainingTags"),
             },
             digital: {
               title: get("digitalTitle"),
@@ -622,17 +610,7 @@
                 location,
               });
           });
-          // Remove exact-duplicate classes (same title+date) before saving
-          const seen = new Set();
-          const uniqueClasses = [];
-          classes.forEach((c) => {
-            const key = `${(c.title || "").toLowerCase().trim()}|${(c.date || "").toLowerCase().trim()}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              uniqueClasses.push(c);
-            }
-          });
-          data.upcomingClasses = uniqueClasses;
+          data.upcomingClasses = classes;
         }
 
         if (section === "testimonials") {
@@ -651,29 +629,20 @@
           data.testimonials = testimonials;
         }
 
+        // NEW: Save Carousel Cards
         if (section === "carouselCards") {
           const cards = [];
           document.querySelectorAll(".carousel-card-entry").forEach((entry) => {
-            const image = entry.querySelector(".card-image").value.trim();
+            const icon = entry.querySelector(".card-icon").value.trim();
             const title = entry.querySelector(".card-title").value.trim();
             const subtitle = entry.querySelector(".card-subtitle").value.trim();
             const price = entry.querySelector(".card-price").value.trim();
             const gradient = entry.querySelector(".card-gradient").value.trim();
 
             if (title || subtitle)
-              cards.push({ image, title, subtitle, price, gradient });
+              cards.push({ icon, title, subtitle, price, gradient });
           });
-          // Deduplicate carousel cards by image+title+subtitle to avoid accidental duplicates
-          const seenCards = new Set();
-          const uniqueCards = [];
-          cards.forEach((c) => {
-            const key = `${(c.image || "").trim()}|${(c.title || "").toLowerCase().trim()}|${(c.subtitle || "").toLowerCase().trim()}`;
-            if (!seenCards.has(key)) {
-              seenCards.add(key);
-              uniqueCards.push(c);
-            }
-          });
-          data.carouselItems = uniqueCards;
+          data.carouselItems = cards;
         }
 
         try {
@@ -702,6 +671,7 @@
         }
       };
 
+      // Dynamic Upcoming Classes
       window.addClass = () => {
         const container = document.getElementById("upcomingClassesList");
         const div = document.createElement("div");
@@ -725,7 +695,7 @@
           </div>
           <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-6 py-2 rounded">Remove Class</button>
         `;
-        container.prepend(div);
+        container.appendChild(div);
       };
 
       function renderUpcomingClasses() {
@@ -757,22 +727,23 @@
         });
       }
 
+      // Dynamic Testimonials
       window.addTestimonial = () => {
         const container = document.getElementById("testimonialsList");
         const div = document.createElement("div");
         div.className =
           "testimonial-entry bg-gray-100 p-6 rounded-xl mb-6 border";
         div.innerHTML = `
-          <textarea class="testimonial-quote w-full p-4 border rounded h-40 mb-4" placeholder="Quote"></textarea>
-          <input class="testimonial-author w-full p-4 border rounded mb-4" placeholder="Author" />
+          <textarea class="testimonial-quote w-full p-4 border rounded h-40 mb-4" placeholder="Quote">${""}</textarea>
+          <input class="testimonial-author w-full p-4 border rounded mb-4" placeholder="Author" value="${""}" />
           <div class="flex items-center gap-4 mb-4">
             <label>Rating:</label>
             <select class="testimonial-rating w-20 p-3 border rounded">
-              <option value="5">5 Stars</option>
-              <option value="4">4 Stars</option>
-              <option value="3">3 Stars</option>
-              <option value="2">2 Stars</option>
-              <option value="1">1 Star</option>
+              <option value="5" ${"" === 5 ? "selected" : ""}>5 Stars</option>
+              <option value="4" ${"" === 4 ? "selected" : ""}>4 Stars</option>
+              <option value="3" ${"" === 3 ? "selected" : ""}>3 Stars</option>
+              <option value="2" ${"" === 2 ? "selected" : ""}>2 Stars</option>
+              <option value="1" ${"" === 1 ? "selected" : ""}>1 Star</option>
             </select>
           </div>
           <button type="button" onclick="this.parentElement.remove()" class="bg-red-600 text-white px-6 py-2 rounded">Remove Testimonial</button>
@@ -806,52 +777,35 @@
         });
       }
 
-      // Carousel Cards with image upload & random gradient
+      // NEW: Dynamic Carousel Cards
       window.addCarouselCard = () => {
         const container = document.getElementById("carouselCardsList");
         const div = document.createElement("div");
         div.className =
           "carousel-card-entry bg-gray-50 p-6 rounded-xl mb-6 border border-gray-200 relative";
-        const randomGradient = getRandomGradient();
         div.innerHTML = `
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Course Image (replaces icon)</label>
-            <input class="card-image w-full p-3 border rounded mb-2" placeholder="Image URL from Cloudinary" />
-            <button type="button" onclick="openUploaderForCarousel(this.previousElementSibling)" class="bg-blue-600 text-white px-4 py-2 rounded w-full">
-              Upload Image to Cloudinary
-            </button>
-          </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <input class="card-icon w-full p-3 border rounded" placeholder="Icon (emoji or text)" />
             <input class="card-title w-full p-3 border rounded" placeholder="Title (e.g. AWS-DEV)" required />
-            <input class="card-price w-full p-3 border rounded" placeholder="Price (e.g. RM5,475.00)" />
           </div>
-
           <input class="card-subtitle w-full p-3 border rounded mb-4" placeholder="Subtitle (e.g. Developing on AWS)" />
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Background Gradient (auto-random)</label>
-            <input class="card-gradient w-full p-3 border rounded" value="${randomGradient}" placeholder="linear-gradient(135deg, #3b82f6, #1e40af)" />
-          </div>
-
-          <!-- Live Preview -->
-          <div class="mt-6 p-4 bg-gray-100 rounded-lg">
-            <p class="text-sm text-gray-600 mb-2 font-medium">Live Preview:</p>
-            <div class="carousel-preview mx-auto" style="background: ${randomGradient};">
-              <div class="image-container">
-                <img src="" alt="Course Image" class="card-preview-image hidden" />
-              </div>
-              <div class="content">
-                <div class="title">AWS-DEV</div>
-                <div class="subtitle">Developing on AWS</div>
-                <div class="price">RM5,400.00 – RM6,075.00</div>
-              </div>
+          <input class="card-price w-full p-3 border rounded mb-4" placeholder="Price (e.g. RM5,475.00)" />
+          <input class="card-gradient w-full p-3 border rounded mb-4" placeholder="Gradient CSS (e.g. linear-gradient(135deg, #3b82f6, #1e40af))" />
+          
+          <!-- Preview -->
+          <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+            <p class="text-sm text-gray-600 mb-2 font-medium">Preview:</p>
+            <div class="carousel-preview mx-auto" style="background: linear-gradient(135deg, #3b82f6, #1e40af);">
+              <div class="icon-box">🌐</div>
+              <div class="title">AWS-DEV</div>
+              <div class="subtitle">Developing on AWS</div>
+              <div class="price">RM5,400.00 – RM6,075.00</div>
             </div>
           </div>
 
           <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded text-sm">Remove</button>
         `;
-        container.prepend(div);
+        container.appendChild(div);
       };
 
       function renderCarouselCards() {
@@ -863,38 +817,22 @@
           div.className =
             "carousel-card-entry bg-gray-50 p-6 rounded-xl mb-6 border border-gray-200 relative";
           div.innerHTML = `
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Course Image (replaces icon)</label>
-              <input class="card-image w-full p-3 border rounded mb-2" value="${card.image || ""}" placeholder="Image URL from Cloudinary" />
-              <button type="button" onclick="openUploaderForCarousel(this.previousElementSibling)" class="bg-blue-600 text-white px-4 py-2 rounded w-full">
-                Upload Image to Cloudinary
-              </button>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <input class="card-icon w-full p-3 border rounded" value="${card.icon || ""}" placeholder="Icon (emoji or text)" />
               <input class="card-title w-full p-3 border rounded" value="${card.title || ""}" placeholder="Title (e.g. AWS-DEV)" required />
-              <input class="card-price w-full p-3 border rounded" value="${card.price || ""}" placeholder="Price (e.g. RM5,475.00)" />
             </div>
-
             <input class="card-subtitle w-full p-3 border rounded mb-4" value="${card.subtitle || ""}" placeholder="Subtitle (e.g. Developing on AWS)" />
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Background Gradient</label>
-              <input class="card-gradient w-full p-3 border rounded" value="${card.gradient || getRandomGradient()}" placeholder="linear-gradient(135deg, #3b82f6, #1e40af)" />
-            </div>
-
-            <!-- Live Preview -->
-            <div class="mt-6 p-4 bg-gray-100 rounded-lg">
-              <p class="text-sm text-gray-600 mb-2 font-medium">Live Preview:</p>
-              <div class="carousel-preview mx-auto" style="background: ${card.gradient || getRandomGradient()};">
-                <div class="image-container">
-                  <img src="${card.image || ""}" alt="Course Image" class="card-preview-image ${card.image ? "" : "hidden"}" />
-                </div>
-                <div class="content">
-                  <div class="title">${card.title || "AWS-DEV"}</div>
-                  <div class="subtitle">${card.subtitle || "Developing on AWS"}</div>
-                  <div class="price">${card.price || "RM5,400.00 – RM6,075.00"}</div>
-                </div>
+            <input class="card-price w-full p-3 border rounded mb-4" value="${card.price || ""}" placeholder="Price (e.g. RM5,475.00)" />
+            <input class="card-gradient w-full p-3 border rounded mb-4" value="${card.gradient || ""}" placeholder="Gradient CSS (e.g. linear-gradient(135deg, #3b82f6, #1e40af))" />
+            
+            <!-- Preview -->
+            <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+              <p class="text-sm text-gray-600 mb-2 font-medium">Preview:</p>
+              <div class="carousel-preview mx-auto" style="background: ${card.gradient || "linear-gradient(135deg, #3b82f6, #1e40af)"};">
+                <div class="icon-box">${card.icon || "🌐"}</div>
+                <div class="title">${card.title || "AWS-DEV"}</div>
+                <div class="subtitle">${card.subtitle || "Developing on AWS"}</div>
+                <div class="price">${card.price || "RM5,400.00 – RM6,075.00"}</div>
               </div>
             </div>
 
@@ -942,31 +880,6 @@
           .open();
       };
 
-      // NEW: Cloudinary for carousel images
-      window.openUploaderForCarousel = (inputElement) => {
-        cloudinary
-          .createUploadWidget(
-            {
-              cloudName: "dxhr3hdkc",
-              uploadPreset: "impact_unsigned",
-              cropping: true,
-              folder: "impact-carousel",
-              resourceType: "image",
-            },
-            (error, result) => {
-              if (!error && result && result.event === "success") {
-                inputElement.value = result.info.secure_url;
-                const preview = inputElement
-                  .closest(".carousel-card-entry")
-                  .querySelector(".card-preview-image");
-                preview.src = result.info.secure_url;
-                preview.classList.remove("hidden");
-              }
-            },
-          )
-          .open();
-      };
-
       window.openSection = (id) => {
         document
           .querySelectorAll(".section-content")
@@ -981,9 +894,10 @@
         });
         if (window.innerWidth < 1024) toggleMobileMenu();
 
+        // Re-render dynamic lists when section opens
         if (id === "upcomingClassesSection") renderUpcomingClasses();
         if (id === "testimonialsSection") renderTestimonials();
-        if (id === "carouselCardsSection") renderCarouselCards();
+        if (id === "carouselCardsSection") renderCarouselCards(); // NEW
       };
 
       window.toggleMobileMenu = () => {
@@ -1153,6 +1067,7 @@
                 11. Footer
               </div>
             </li>
+            <!-- NEW SECTION -->
             <li>
               <div
                 onclick="openSection('carouselCardsSection')"
@@ -1173,7 +1088,7 @@
         </nav>
       </div>
 
-      <!-- Editor Area -->
+      <!-- Main Editor Area -->
       <div class="flex-1 overflow-y-auto p-8 lg:p-16 bg-gray-50">
         <div class="max-w-6xl mx-auto space-y-12">
           <!-- 1. Hero Section -->
@@ -1688,7 +1603,7 @@
             </button>
           </div>
 
-          <!-- 12. Carousel Cards -->
+          <!-- 12. Carousel Cards (NEW SECTION) -->
           <div
             id="carouselCardsSection"
             class="section-content bg-white rounded-3xl shadow-xl p-12"
@@ -1697,8 +1612,9 @@
               Carousel Cards (Featured Programs)
             </h2>
             <p class="text-gray-600 mb-6">
-              Add cards for the homepage carousel. Upload an image for each card
-              (replaces icon). Gradient is auto-generated randomly but editable.
+              Add cards for the homepage carousel. Each card needs a title and
+              subtitle at minimum. Gradient is optional but recommended for
+              visual appeal.
             </p>
             <button
               onclick="addCarouselCard()"

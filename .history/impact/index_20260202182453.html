@@ -566,24 +566,31 @@
                 price: "RM5,475.00",
                 gradient: "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)",
               },
-
+              {
+                image: "",
+                icon: "🔧",
+                title: "AWS-DEV",
+                subtitle: "Developing on AWS",
+                price: "RM5,400.00 – RM6,075.00",
+                gradient: "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)",
+              },
               // add more fallback items if you want
             ];
           }
 
           // Duplicate items for infinite loop (seamless scrolling)
+          const duplicatedItems = [...items, ...items];
 
-          track.innerHTML = items
+          track.innerHTML = duplicatedItems
             .map((item) => {
-              console.log(item);
               // Use uploaded image if available, otherwise fallback to emoji icon
               const topVisual = item.image
-                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[130px] max-h-[130px] object-contain">`
+                ? `<img src="${item.image}" alt="${item.title}" class="max-w-[80px] max-h-[80px] object-contain">`
                 : `<div class="text-5xl">${item.icon || "❓"}</div>`;
 
               return `
-        <div class="carousel-item p-0  flex-shrink-0 w-[380px] mx-4 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl  bg-white border border-gray-200">
-          <div class="h-full flex flex-col bg-white border border-gray-200">
+        <div class="carousel-item p-0  flex-shrink-0 w-[380px] mx-4 rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+          <div class="h-full flex flex-col ">
             <!-- Top icon/image area - white rectangle -->
             <div style="height:200px; background: ${item.gradient || "linear-gradient(135deg, #a5f3fc, #67e8f9, #22d3ee)"}" class="p-6 flex items-center justify-center border-b  border-gray-200 ">
               ${topVisual}
@@ -591,10 +598,10 @@
 
             <!-- Main content area -->
             <div class=" bg-tranparent flex-grow">
-              <h3 class="text-sm font-bold text-orange-600 mb-1">
+              <h3 class="text-xl font-bold text-orange-600 mb-1">
                 ${item.title}:
               </h3>
-              <p class="text-sm text-gray-800 leading-tight">
+              <p class="text-base text-gray-800 leading-tight">
                 ${item.subtitle}
               </p>
             </div>
@@ -618,7 +625,7 @@
           const originalLength = items.length * itemWidth;
 
           function autoScroll() {
-            position += 1.2; // ← speed (smaller = slower, e.g. 0.4)
+            position += 0.8; // ← speed (smaller = slower, e.g. 0.4)
             track.style.transform = `translateX(-${position}px)`;
 
             // Reset position when reaching end of first copy (no jump)
@@ -632,7 +639,7 @@
             }
           }
 
-          let scrollInterval = setInterval(autoScroll, 10);
+          let scrollInterval = setInterval(autoScroll, 20);
 
           // Pause on hover
           const container = document.querySelector(".carousel-container");
@@ -659,9 +666,9 @@
         class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
       >
         <img
-          width="100px"
+          width="50px"
           id="hrdcLogo"
-          class="text-2xl font-bold text-accent -mb-3"
+          class="text-2xl font-bold text-accent"
           alt="Impact Logo"
         />
 
@@ -1095,7 +1102,7 @@
     </section>
 
     <!-- Featured Training Programs - Exact match to screenshot -->
-    <section class="py-16">
+    <section class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-6">
         <h2
           class="text-4xl md:text-5xl font-bold text-center mb-12 text-gray-900"
@@ -1103,7 +1110,7 @@
           Featured Training Programs
         </h2>
 
-        <div class="carousel-container overflow-x-hidden relative">
+        <div class="carousel-container overflow-hidden relative">
           <div
             class="carousel-track flex transition-transform duration-1000 ease-in-out"
             id="carouselTrack"
